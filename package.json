@@ -1,0 +1,35 @@
+{
+  "name": "secp256k1-zkp",
+  "version": "1.0.0",
+  "description": "Essential methods of the secp256k1-zkp lib exported to JS for handling Elements confidential transactions",
+  "main": "./lib/index",
+  "types": "./lib/index.d.ts",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "configure": "npm run docker emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes",
+    "make": "npm run docker emmake make",
+    "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
+    "lint": "npx eslint lib",
+    "docker": "docker run -e DEBUG=1 -v $(pwd):/ --rm -t secp256k1-js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vulpemventures/secp256k1-zkp.git"
+  },
+  "author": "Vulpem Ventures",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vulpemventures/secp256k1-zkp/issues"
+  },
+  "homepage": "https://github.com/vulpemventures/secp256k1-zkp#readme",
+  "dependencies": {
+    "@types/node": "^13.7.6",
+    "long": "^3.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "mocha": "^7.0.0"
+  }
+}
