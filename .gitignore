@@ -1,0 +1,9 @@
+src/libsecp256k1.js
+node_modules
+Makefile
+coverage
+build
+./test
+.vscode
+settings.json
+
