@@ -6,7 +6,7 @@
     "scripts": {
         "configure": "npm run docker emconfigure ./configure src secp256k1-build -- --with-bignum=no",
         "make": "npm run docker emmake make",
-        "test": "npm run lint -- --quiet && mocha -t 6000 src/**/*.test.js",
+        "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
         "lint": "eslint src",
         "docker": "docker run -e DEBUG=1 -v $(pwd):/src --rm -t secp256k1-js"
     },
