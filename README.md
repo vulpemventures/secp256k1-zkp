@@ -16,10 +16,7 @@ $ yarn test
 ```sh
 $ npm install
 $ git submodule update --init
-$ emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes
+$ emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes
 $ emmake make
 $ npm run test
 ```
-
-NOTE:  
-Before runnning `make`, copy the content of `rangeproof.wrapper` and `surjectionproof.wrapper` just before the `#endif` at the very bottom of  `main_impl.h` of the respective C module that you can find at path `secp256k1-zkp/src/module/<rangeproof|surjection>/`.
