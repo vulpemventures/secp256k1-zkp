@@ -1,10 +1,2 @@
-const pedersen = require('./pedersen');
-const generator = require('./generator');
-const rangeproof = require('./rangeproof');
-const surjectionproof = require('./surjectionproof');
-module.exports = {
-  pedersen,
-  generator,
-  rangeproof,
-  surjectionproof
-};
+const Module = require("./libsecp256k1");
+module.exports = Module;
