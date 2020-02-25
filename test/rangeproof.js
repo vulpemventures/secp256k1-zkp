@@ -1,100 +1,63 @@
 const assert = require("assert");
-const createHash = require("create-hash");
-const Long = require("long");
 
-const Module = require("../src");
+const Module = require("../lib");
 const { sign, info, verify, rewind } = Module.rangeproof;
-const { blindSum, commit } = Module.pedersen;
+const fixtures = require("./fixtures/rangeproof.json");
 
-const MAX_U64 = Long.MAX_UNSIGNED_VALUE.toString();
-const sha256 = data =>
-  createHash("sha256")
-    .update(data)
-    .digest();
-
-describe("libsecp256k1-zkp", () => {
-  const h1 = sha256("h1"); // blinding factor
-  const nonce = sha256("nonce");
-
-  describe("range proof", () => {
-    it("proof sign", done => {
-      const B1 = blindSum([h1], 0);
-      const C1 = commit(B1, 0);
-
-      // All of the following pass and return the same proofs aa the crypto_api in bitshares.
-      assert.equal(shaId(sign(C1, B1, nonce, 0)), "a297bd49");
-      assert.equal(
-        shaId(sign(C1, B1, nonce, 19, 0, 0, MAX_U64)),
-        "3ade4c09"
+describe("range proof", () => {
+  it("proof sign", () => {
+    fixtures.sign.forEach(f => {
+      const commit = Buffer.from(f.commit, "hex");
+      const nonce = Buffer.from(f.commit, "hex");
+      const blind = Buffer.from(f.blind, "hex");
+      const message = Buffer.from(f.message, "hex");
+      const extraCommit = Buffer.from(f.extraCommit, "hex");
+      const proof = sign(
+        commit,
+        blind,
+        nonce,
+        f.value,
+        f.minValue,
+        0,
+        0,
+        message,
+        extraCommit
       );
-      throws(() => {
-        sign(C1, B1, nonce, 0, MAX_U64, 0, MAX_U64);
-      }, /secp256k1_rangeproof_sign/);
-      throws(() => {
-        sign(C1, B1, nonce, 0, 0, 65, MAX_U64);
-      }, /secp256k1_rangeproof_sign/);
-      throws(() => {
-        sign(C1, B1, nonce, -1, 0, 0, 123);
-      }, /secp256k1_rangeproof_sign/);
-      throws(() => {
-        sign(C1, B1, nonce, 18, 0, 0, 123);
-      }, /secp256k1_rangeproof_sign/);
-      done();
+      assert.deepEqual(proof.toString("hex"), f.expected);
     });
+  });
 
-    it("proof info", done => {
-      const B1 = blindSum([h1], 0);
-      const C1 = commit(B1, 0);
-      const P1 = sign(C1, B1, nonce);
-      const p1 = info(P1);
-      assert.equal(p1.exp, 0);
-      assert.equal(p1.mantissa, 1);
-      assert.equal(p1.min, 0);
-      assert.equal(p1.max, 1);
-      done();
+  it("proof info", () => {
+    fixtures.info.forEach(f => {
+      const proof = Buffer.from(f.proof, "hex");
+      const proofInfo = info(proof);
+      assert.deepEqual(proofInfo.exp, f.expected.exp);
+      assert.deepEqual(proofInfo.mantissa, f.expected.mantissa);
+      assert.deepEqual(proofInfo.minValue, f.expected.minValue);
+      assert.deepEqual(proofInfo.maxValue, f.expected.maxValue);
     });
+  });
 
-    it("proof verify", done => {
-      const B1 = blindSum([h1], 0);
-      const C1 = commit(B1, 0);
-      const P1 = sign(C1, B1, nonce);
-      assert.equal(verify(C1, P1), true);
-      done();
+  it("proof verify", () => {
+    fixtures.verify.forEach(f => {
+      const proof = Buffer.from(f.proof, "hex");
+      const commit = Buffer.from(f.commit, "hex");
+      const extraCommit = Buffer.from(f.extraCommit, "hex");
+      assert.deepEqual(verify(commit, proof, extraCommit), f.expected);
     });
+  });
 
-    it("range proof rewind", done => {
-      const B1 = blindSum([h1]);
-      const C1 = commit(B1, 0);
-      const P1 = sign(C1, B1, nonce);
-      const res = rewind(C1, P1, nonce);
-      assert.equal(res.value, 0);
-      assert.equal(res.minValue, 0);
-      assert.equal(res.maxValue, 1);
-      assert.equal(hexId(res.blind), "cceed11e");
-      done();
+  it("range proof rewind", () => {
+    fixtures.rewind.forEach(f => {
+      const proof = Buffer.from(f.proof, "hex");
+      const commit = Buffer.from(f.commit, "hex");
+      const extraCommit = Buffer.from(f.extraCommit, "hex");
+      const res = rewind(commit, proof, commit, extraCommit);
+      assert.deepEqual(res.value, f.expected.value);
+      assert.deepEqual(res.minValue, f.expected.minValue);
+      assert.deepEqual(res.maxValue, f.expected.maxValue);
+      assert.deepEqual(res.message.toString("hex"), f.expected.message);
+      assert.deepEqual(res.blindFactor.toString("hex"), f.expected.blindFactor);
     });
   });
 });
-
-const hexId = arr =>
-  Buffer.from(arr)
-    .slice(0, 4)
-    .toString("hex");
-const shaId = buf =>
-  hexId(
-    createHash("sha1")
-      .update(buf)
-      .digest()
-  );
-
-function throws(fn, match) {
-  try {
-    fn();
-    assert(false, "Expecting error");
-  } catch (error) {
-    if (!match.test(error)) {
-      error.message = `Error did not match ${match}\n${error.message}`;
-      throw error;
-    }
-  }
-}
