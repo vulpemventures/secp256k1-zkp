@@ -61,11 +61,11 @@ int generator_serialize(unsigned char *output, const unsigned char *gen_data)
   return ret;
 }
 
-int pedersen_blind_generator_blind_sum(const uint64_t value, const unsigned char* const *generator_blinds, unsigned char **blind_factors, size_t n_total, size_t n_inputs, unsigned char * bytes_out)
+int pedersen_blind_generator_blind_sum(const uint64_t *values, const unsigned char* const *generator_blinds, unsigned char **blind_factors, size_t n_total, size_t n_inputs, unsigned char * bytes_out)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   blind_factors[n_total - 1] = bytes_out;
-  int ret = secp256k1_pedersen_blind_generator_blind_sum(ctx, &value, generator_blinds, (unsigned char *const *)blind_factors, n_total, n_inputs);
+  int ret = secp256k1_pedersen_blind_generator_blind_sum(ctx, values, generator_blinds, (unsigned char *const *)blind_factors, n_total, n_inputs);
   secp256k1_context_destroy(ctx);
   return ret;
 }
