@@ -10,14 +10,14 @@
     "configure": "npm run docker emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes",
     "make": "npm run docker emmake make",
     "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
-    "lint": "eslint lib",
+    "lint": "npx eslint lib",
     "docker": "docker run -e DEBUG=1 -v $(pwd):/src --rm -t secp256k1-js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vulpemventures/secp256k1-zkp.git"
   },
-  "author": "",
+  "author": "Vulpem Ventures Team",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/vulpemventures/secp256k1-zkp/issues"
