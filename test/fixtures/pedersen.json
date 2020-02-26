@@ -2,27 +2,27 @@
   "commit": [
     {
       "blind": "75da7cf9cd78da579500bd51ebf89e3985e85e1343f597c2d8e82de79d725230",
-      "value": 4290671282, 
+      "value": "4290671282", 
       "expected": "085ddb6d7b02734fc7e31d569850bcf1253fe1215bb41820d07b7fe8daefc11142"
     },
     {
       "blind": "c3f39f3654e205700ec25e5ad67f51628afba90ed9101464782787cf65bc7096",
-      "value": 2623743551, 
+      "value": "2623743551", 
       "expected": "08cae771a459cb2fd78711c11bf69d3b9758f1432b08a42c8d0f029d32a2a0ff5b"
     },
     {
       "blind": "8f454a647e69516779b9ce4eb6b00d67f1328907710c31ffde1ba3d59e3485de",
-      "value": 856618978,
+      "value": "856618978",
       "expected": "09e0c8cf6f1277cd0a60c52693695dbc970e5d3575c380e15032a764a6a51120bd"
     },
     {
       "blind": "b0eeee57cf26a4725e8b82f4ce379b5568cf36641ead98b3c55a64c87c3f6cc2",
-      "value": 7306745478,
+      "value": "7306745478",
       "expected": "08122456a30fcf79c53cf637d63d9048bded20c7e6773557bc6ae156e901cfce62"
     },
     {
       "blind": "3abaa6acad7da4a8f498330c8e7cfd52cb7db0b64eb9647b9e8d5a012e1ec96e",
-      "value": 4829563055,
+      "value": "4829563055",
       "expected": "0902cc869bfcbcddfb3a1cb208b1732d2504b0ab50aea65b465bb5bd9ee4952ab5"
     }
   ],
