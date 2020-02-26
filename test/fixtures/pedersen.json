@@ -169,38 +169,101 @@
   ],
   "blindGeneratorBlindSum": [
     {
+      "nInputs": 1,
+      "values": [
+        "9223370907444564659",
+        "3160103168159837358",
+        "4556369264005083601",
+        "25328597902566070",
+        "1297268674017481603",
+        "42248069444593420",
+        "120056352688773499",
+        "2505355624020802",
+        "13635550101204825",
+        "851857802305756",
+        "4351741902257260",
+        "614839285416132",
+        "33443274990321",
+        "2701860068338",
+        "402411850209",
+        "888964115465"
+      ],
+      "blindGenerators": [
+        "686269065748c5a857c2fb4f76b28a283ebfe20c8ebd62f14eebf9cb109f0235",
+        "12dff30d9161b951c3131eea628b4896534cec1fd561c15fd182e4db6c7656aa",
+        "06e561259200ae50e1c2db18dc9b9979f88e0c0968aee8c91375a9f1d703a661",
+        "4dc60247d300a857aa1edab32008b751e9f3c1be9c703e5618ba46c81bb25e2f",
+        "4be849a18c5c794b37b2a037667ee6d018dca81cb2203937f0ab308eae56b280",
+        "f3dd0b3b5b71529d6f802b117ac607c7cb4c1ba3710c88144b8ee98ba97a199d",
+        "4340c5406fda91e9c1702dd877e0793f6ced41aaeaeaee54df7ace591d47f89d",
+        "953d75c7dc02537a0644acc17eb47202f5098b0fd353d6071c650f78856fb165",
+        "a93f37c1ed43772129e3fe502c67189e65db7a2f1e4b03cf0b17043f7ed3c784",
+        "e44a7673bfeb34db61bbea9b8878dc2b29f6a44b04d691aeab3a3fdc355b7373",
+        "f80381f807fbe4ba5dddcf985a5724d1ff8f2acb9589062611994aa773867d92",
+        "95905f2391f19f87e922f94e8d42072e440d04e65b328b8a9e197450bc0247e3",
+        "26e4d4150510aed890b0d1ef8170c0e360edf7e9a2912357590dc1773f34d0ff",
+        "c5e693fa2b211849846b9f399253d80de9cee299207396b09f239375b6d5e6e7",
+        "a89a92f3f06c9cb472f0159fe3379ac2681288376289b53f7307f16c955835fa",
+        "7947cae8c870d7ac8bacf0ca0de26c9f6f0ed45acd1ad1ea83308775356538d9"
+      ],
+      "blindFactors": [
+        "455f6548abd2e95f5bf08c9051a7ee21cadac1df7df15f49a03363cd93da2a59",
+        "3e1be9d94a83ae9c3c48a2b69b2a9df09e77185f213cb68dfd88c899ab9a4bdd",
+        "d1f0b640aa3b5596d0ea8d18f1d0aaf1b5b1a2f230338b3b6cd5eab2c8eafe10",
+        "1e619bb4b858e1a0dd2df2e5a993a896734d3f50b1db4a7afe754b3b17c16e7a",
+        "0e4ecb61e53c7f23439795aaaa7d87d4b13d8597d0b611c406e501258308879c",
+        "ec2cc90c34a67f7e829eb7bf314b637a621284a738d4a607013bebad0825a43c",
+        "1fda366d7efb676f72567a975ec19ba9d83ba393dd91959f3db64dcff298d520",
+        "ce636264c43656c290bf8aba799215960147911533442aae145bd2d2a03f66ab",
+        "1fad1df18b5e6eeb2c1437636a3659da429d860e86e2c592aefcb9114f590db2",
+        "8736e1dab7df51f7e894070af49feba2696afdcdacda938c881d043717fc6af0",
+        "450f4ab37768b053c1ec850542add7bcb2c4f6053488678e7f9605153dbd8efb",
+        "7e1d3514bb4df48a4bc42e925f3f0cc568d2a9d5bb30432a0625e02bfb6d455f",
+        "d8ac5c36d74bfff54e4eb6fbc01dfb06c879eaa5f2b34a3eee2e0fc106225769",
+        "7d6eadeacc65f3bfa6a24f2a2a28292edfa800786d3f1b7f600231417772c659",
+        "4ca016bb7f7a15d8c0e1825fb20b76f59750555caf61da77573c028cd3ef62e7"
+      ],
+      "expected": "e1a140ae971b82910bec2d98a712f757a27d079ce87f1c55a2a0c36f5af27922"
+    },
+    {
       "nInputs": 0,
-      "values": [1402118166],
+      "values": ["1402118166"],
+      "blindFactors": [],
       "blindGenerators": ["2a4573f14ccfb1175c4a1fbcb541ef124cabbab9dce98a783fa50b300ed2d5dd"],
       "expected": "9a0c1464053983bf75679461de15546afc7ab51e30301cfce50960829fee4565"
     },
     {
       "nInputs": 0,
-      "values": [3638801394],
+      "values": ["3638801394"],
+      "blindFactors": [],
       "blindGenerators": ["56e33a1674c46b1951bb01131a2adfa3165ca7841fcb0b2e540e389766bfb5cd"],
       "expected": "87261e97f306cc30e9743fef0312e5ed3107b4c635e9601bc7f0c832f9268689"
     },
     {
       "nInputs": 0,
-      "values": [2211154800],
+      "values": ["2211154800"],
+      "blindFactors": [],
       "blindGenerators": ["2c114e642f7336e6e4c99f67143710f8e8d0e790f05adb2175fe19afd7d0200f"],
       "expected": "e523b8f2fe9e044f4828159350596a4000fbcf12dfabfcd800ded564abf8c748"
     },
     {
       "nInputs": 0,
-      "values": [2438659112],
+      "values": ["2438659112"],
+      "blindFactors": [],
       "blindGenerators": ["906bf458c1023e3af9c18a3284983615cc3ed7d7f529bff7a274a650d25d3ba2"],
       "expected": "fe14541a5a31cb9d42dbd96fae6c19695309c3431fde5289f8113ddcf9aeb34c"
     },
     {
       "nInputs": 0,
-      "values": [633090570],
+      "values": ["633090570"],
+      "blindFactors": [],
       "blindGenerators": ["78d892719df56ff76c6ea36f1e8e1eef9a96dd02ba6ca599f4cf6084b7338ab6"],
       "expected": "03ab9d48e82bae4912bceed99c77c6ecd4c1cd4f8f960512684e042d991d36f9"
     },
     {
       "nInputs": 0,
-      "values": [405385747],
+      "values": ["405385747"],
+      "blindFactors": [],
       "blindGenerators": ["c3446130478fc5e882712eba6eb17769b413a214689ba2e4f337366bb300cb16"],
       "expected": "dee847143a412489a8df899443913284213c1f5aa2a4bde73d4de528e16fb683"
     }

@@ -53,7 +53,7 @@ describe("pedersen", () => {
 
   it("blind generator blind sum", () => {
     fixtures.blindGeneratorBlindSum.forEach(f => {
-      const blindFactors = f.blindGenerators.map(() => Buffer.alloc(0));
+      const blindFactors = f.blindFactors.map(b => Buffer.from(b, "hex"));
       const blindGenerators = f.blindGenerators.map(b => Buffer.from(b, "hex"));
       assert.equal(
         blindGeneratorBlindSum(
