@@ -11,7 +11,7 @@
     "make": "npm run docker emmake make",
     "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
     "lint": "npx eslint lib",
-    "docker": "docker run -e DEBUG=1 -v $(pwd):/src --rm -t secp256k1-js"
+    "docker": "docker run -e DEBUG=1 -v $(pwd):/ --rm -t secp256k1-js"
   },
   "repository": {
     "type": "git",
