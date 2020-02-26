@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/vulpemventures/secp256k1-zkp.git"
   },
-  "author": "Vulpem Ventures Team",
+  "author": "Vulpem Ventures",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/vulpemventures/secp256k1-zkp/issues"
