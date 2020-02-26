@@ -117,7 +117,7 @@ blindGeneratorBlindSum :: Array -> Number -> Array -> Array -> Buffer
 
 Set the final Pedersen blinding factor correctly when the generators themselves have blinding factors.
 
-* `values` array of asset values.
+* `values` array of string asset values.
 * `nInputs` How many of the initial array elements represent commitments that will be negated in the final sum.
 * `blindGenerators` array of asset blinding factors.
 * `blindFactors` array of commitment blinding factors.
