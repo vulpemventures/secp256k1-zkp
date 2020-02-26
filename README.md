@@ -81,13 +81,13 @@ Serialize a raw generator into a serialized byte sequence.
 #### commit(blindFactor, value)
 
 ```haskell
-commit :: Buffer -> Number -> Buffer
+commit :: Buffer -> String -> Buffer
 ```
 
 Generate a pedersen commitment.
 
 * `blindFactor` 32-byte blinding factor.
-* `value` uint64 value to commit to.
+* `value` uint64 value to commit to as string.
 
 #### commitSerialize(commitment)
 
@@ -146,10 +146,10 @@ Verify a tally of pedersen commitments.
 
 ### Rangeproof
 
-#### sign(commit, blind, nonce, value[, minValue=0, base10Exp=0, minBits=0, message=[], extraCommit=[]])
+#### sign(commit, blind, nonce, value[, minValue="0", base10Exp=0, minBits=0, message=[], extraCommit=[]])
 
 ```haskell
-sign :: Buffer -> Buffer -> Buffer -> Number [-> Number -> Number -> Number -> Buffer -> Buffer] -> Buffer
+sign :: Buffer -> Buffer -> Buffer -> String [-> String -> Number -> Number -> Buffer -> Buffer] -> Buffer
 ```
 
 Author a proof that a committed value is within a range.
@@ -157,8 +157,8 @@ Author a proof that a committed value is within a range.
 * `commit` 33-byte commitment to being proved.
 * `blind` 32-byte blinding factor used by commit.
 * `nonce` 32-byte secret nonce used to initialize the proof.
-* `value` actual value of the commitment.
-* `minValue` constructs a proof where the verifer can tell the minimum value is at least the specified amount.
+* `value` actual value of the commitment as string.
+* `minValue` constructs a proof where the verifer can tell the minimum value is at least the specified amount (passed as string).
 * `base10Exp` base-10 exponent. Digits below above will be made public, but the proof will be made smaller. Allowed range is -1 to 18.
 * `minBits` number of bits of the value to keep private. (0 = auto/minimal, - 64).
 * `message` data to be embedded in the rangeproof that can be recovered by rewinding the proof.
