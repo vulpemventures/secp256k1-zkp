@@ -4,7 +4,7 @@ export function serialize(proof: {
   data: Buffer;
 }): Buffer;
 export function initialize(
-  inputTags: Array,
+  inputTags: Array<Buffer>,
   inputTagsToUse: number,
   outputTag: Buffer,
   maxIterations: number,
@@ -12,7 +12,7 @@ export function initialize(
 ): { nInputs: number; usedInputs: Buffer; data: Buffer };
 export function generate(
   proof: { nInputs: number; usedInputs: Buffer; data: Buffer },
-  inputTags: Array,
+  inputTags: Array<Buffer>,
   outputTag: Buffer,
   inputIndex: number,
   inputBlindingKey: Buffer,
@@ -20,6 +20,6 @@ export function generate(
 ): { nInputs: number; usedInputs: Buffer; data: Buffer };
 export function verify(
   proof: { nInputs: number; usedInputs: Buffer; data: Buffer },
-  inputTags: Array,
+  inputTags: Array<Buffer>,
   outputTag: Buffer
 ): boolean;
