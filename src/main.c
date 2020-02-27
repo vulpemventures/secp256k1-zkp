@@ -91,12 +91,14 @@ int pedersen_commitment_serialize(unsigned char *output, unsigned char *commit_d
   return ret;
 }
 
-int pedersen_commit(unsigned char *commit_data, const unsigned char *blind, uint64_t value)
+int pedersen_commit(unsigned char *commit_data, const unsigned char *blind, uint64_t value, const unsigned char *generator_data)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pedersen_commitment commit;
   memcpy(commit.data, commit_data, 33);
-  int ret = secp256k1_pedersen_commit(ctx, &commit, blind, value, secp256k1_generator_h);
+  secp256k1_generator gen;
+  memcpy(gen.data, generator_data, 64);
+  int ret = secp256k1_pedersen_commit(ctx, &commit, blind, value, &gen);
   memcpy(commit_data, &(commit.data), 33);
   secp256k1_context_destroy(ctx);
   return ret;
