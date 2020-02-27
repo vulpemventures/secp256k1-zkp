@@ -4,6 +4,7 @@ export function info(
 export function verify(
   commit: Buffer,
   proof: Buffer,
+  generator: Buffer,
   extraCommit?: Buffer
 ): boolean;
 export function sign(
@@ -11,6 +12,7 @@ export function sign(
   blind: Buffer,
   nonce: Buffer,
   value: string,
+  generator: Buffer,
   minValue?: string,
   base10Exp?: number,
   minBits?: number,
@@ -21,6 +23,7 @@ export function rewind(
   commit: Buffer,
   proof: Buffer,
   nonce: Buffer,
+  generator: Buffer,
   extraCommit?: Buffer
 ): {
   value: string;

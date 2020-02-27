@@ -134,12 +134,14 @@ int pedersen_verify_tally(const unsigned char *const *commits_data, size_t n_com
   return ret;
 }
 
-int rangeproof_sign(unsigned char *proof, size_t *plen, uint64_t min_value, const unsigned char *commit_data, const unsigned char *blind, const unsigned char *nonce, int exp, int min_bits, uint64_t value, const unsigned char *message, size_t msg_len, const unsigned char *extra_commit, size_t extra_commit_len)
+int rangeproof_sign(unsigned char *proof, size_t *plen, uint64_t min_value, const unsigned char *commit_data, const unsigned char *blind, const unsigned char *nonce, int exp, int min_bits, uint64_t value, const unsigned char *message, size_t msg_len, const unsigned char *extra_commit, size_t extra_commit_len, const unsigned char *generator_data)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pedersen_commitment commit;
   memcpy(commit.data, commit_data, 33);
-  int ret = secp256k1_rangeproof_sign(ctx, proof, plen, min_value, &commit, blind, nonce, exp, min_bits, value, message, msg_len, extra_commit, extra_commit_len, secp256k1_generator_h);
+  secp256k1_generator gen;
+  memcpy(gen.data, generator_data, 64);
+  int ret = secp256k1_rangeproof_sign(ctx, proof, plen, min_value, &commit, blind, nonce, exp, min_bits, value, message, msg_len, extra_commit, extra_commit_len, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
@@ -152,22 +154,26 @@ int rangeproof_info(int *exp, int *mantissa, uint64_t *min_value, uint64_t *max_
   return ret;
 }
 
-int rangeproof_verify(uint64_t *min_value, uint64_t *max_value, const unsigned char *commit_data, const unsigned char *proof, size_t plen, const unsigned char *extra_commit, size_t extra_commit_len)
+int rangeproof_verify(uint64_t *min_value, uint64_t *max_value, const unsigned char *commit_data, const unsigned char *proof, size_t plen, const unsigned char *extra_commit, size_t extra_commit_len, const unsigned char *generator_data)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pedersen_commitment commit;
   memcpy(commit.data, commit_data, 64);
-  int ret = secp256k1_rangeproof_verify(ctx, min_value, max_value, &commit, proof, plen, extra_commit, extra_commit_len, secp256k1_generator_h);
+  secp256k1_generator gen;
+  memcpy(gen.data, generator_data, 64);
+  int ret = secp256k1_rangeproof_verify(ctx, min_value, max_value, &commit, proof, plen, extra_commit, extra_commit_len, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int rangeproof_rewind(unsigned char *blind_out, uint64_t *value_out, unsigned char *message_out, size_t *outlen, const unsigned char *nonce, uint64_t *min_value, uint64_t *max_value, const unsigned char *commit_data, const unsigned char *proof, size_t plen, const unsigned char *extra_commit, size_t extra_commit_len)
+int rangeproof_rewind(unsigned char *blind_out, uint64_t *value_out, unsigned char *message_out, size_t *outlen, const unsigned char *nonce, uint64_t *min_value, uint64_t *max_value, const unsigned char *commit_data, const unsigned char *proof, size_t plen, const unsigned char *extra_commit, size_t extra_commit_len, const unsigned char *generator_data)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pedersen_commitment commit;
+  secp256k1_generator gen;
+  memcpy(gen.data, generator_data, 64);
   memcpy(commit.data, commit_data, 33);
-  int ret = secp256k1_rangeproof_rewind(ctx, blind_out, value_out, message_out, outlen, nonce, min_value, max_value, &commit, proof, plen, extra_commit, extra_commit_len, secp256k1_generator_h);
+  int ret = secp256k1_rangeproof_rewind(ctx, blind_out, value_out, message_out, outlen, nonce, min_value, max_value, &commit, proof, plen, extra_commit, extra_commit_len, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
