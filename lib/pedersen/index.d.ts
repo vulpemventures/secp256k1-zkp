@@ -1,11 +1,14 @@
 export function commit(blindFactor: Buffer, value: string): Buffer;
 export function commitSerialize(commitment: Buffer): Buffer;
 export function commitParse(input: Buffer): Buffer;
-export function blindSum(blinds: Array, nneg?: number): Buffer;
-export function verifySum(commits: Array, negativeCommits: Array): boolean;
+export function blindSum(blinds: Array<Buffer>, nneg?: number): Buffer;
+export function verifySum(
+  commits: Array<Buffer>,
+  negativeCommits: Array<Buffer>
+): boolean;
 export function blindGeneratorBlindSum(
-  values: Array,
+  values: Array<string>,
   nInputs: number,
-  blindGenerators: Array,
-  blindFactors: Array
+  blindGenerators: Array<Buffer>,
+  blindFactors: Array<Buffer>
 ): Buffer;

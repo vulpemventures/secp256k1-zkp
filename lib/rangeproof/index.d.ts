@@ -16,7 +16,7 @@ export function sign(
   minBits?: number,
   message?: Buffer,
   extraCommit?: Buffer
-);
+): Buffer;
 export function rewind(
   commit: Buffer,
   proof: Buffer,

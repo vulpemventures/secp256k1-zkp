@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Essential methods of the secp256k1-zkp lib exported to JS for handling Elements confidential transactions",
   "main": "./lib/index",
+  "types": "./lib/index.d.ts",
   "engines": {
     "node": ">=8.0.0"
   },
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/vulpemventures/secp256k1-zkp#readme",
   "dependencies": {
+    "@types/node": "^13.7.6",
     "long": "^3.2.0"
   },
   "devDependencies": {
