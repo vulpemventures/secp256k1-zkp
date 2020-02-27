@@ -16,7 +16,6 @@ RELEASE_FLAGS="-O3 --memory-init-file 0"
 DEBUG_FLAGS="-g --memory-init-file 0 --closure 0 -s ASSERTIONS=1"
 
 TARGET_SCRIPT_NAME="libsecp256k1.js"
-GLUE_SCRIPT_NAME="init.js"
 INNER_BUILD_DIR_NAME="secp256k1-zkp"
 
 #########################################
@@ -46,14 +45,6 @@ BUILD_DIR=`pwd`
 INNER_BUILD_DIR="${BUILD_DIR}/${INNER_BUILD_DIR_NAME}"
 shift
 shift
-
-# Make sure glue script exist at source directory
-GLUE_SCRIPT="${SOURCE_DIR}/${GLUE_SCRIPT_NAME}"
-if ! [ -e "${GLUE_SCRIPT}" ]
-then
-    echo "${ERR}Cannot find glue script at \"${GLUE_SCRIPT}\""
-    exit 2
-fi
 
 # Check if emscripten is available
 if ! [ -x "$(command -v emcc)"  ]
@@ -148,7 +139,7 @@ then
     touch "${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o"
 fi
 # EXPORTED_FUNCTIONS=${EXPORT_TEXT}
-FINAL_PASS_FLAGS="${FINAL_PASS_FLAGS} -s NO_EXIT_RUNTIME=1 -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='${EXPORTED_METHODS}'"
+FINAL_PASS_FLAGS="${FINAL_PASS_FLAGS} -I${INNER_BUILD_DIR}/include -L${INNER_BUILD_DIR}/.libs -lsecp256k1 -s NO_EXIT_RUNTIME=1 -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='${EXPORTED_METHODS}'"
 cat >Makefile <<EOL
 .PHONY: default all install clean veryclean
 
@@ -159,8 +150,8 @@ all: ${TARGET_SCRIPT_NAME}
 install: all
 	-mv "${TARGET_SCRIPT_NAME}" "${SOURCE_DIR}/${TARGET_SCRIPT_NAME}"
 
-${TARGET_SCRIPT_NAME}: ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o ${GLUE_SCRIPT}
-	EMCC_CLOSURE_ARGS="--language_in ECMASCRIPT6 --language_out ES5" emcc "${INNER_BUILD_DIR}/src/libsecp256k1_la-secp256k1.o" -o ${TARGET_SCRIPT_NAME} --pre-js "${GLUE_SCRIPT}" ${FINAL_PASS_FLAGS}
+${TARGET_SCRIPT_NAME}: ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o
+	EMCC_CLOSURE_ARGS="--language_in ECMASCRIPT6 --language_out ES5" emcc "${SOURCE_DIR}/main.c" -o ${TARGET_SCRIPT_NAME} ${FINAL_PASS_FLAGS}
 
 ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o:
 	${ENVIRONMENT_EXPORT_COMMANDS}

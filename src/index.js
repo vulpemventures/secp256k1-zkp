@@ -1,2 +1,2 @@
-const Module = require('./libsecp256k1')
-module.exports = Module
+const Module = require("./libsecp256k1");
+module.exports = Module;
