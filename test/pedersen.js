@@ -34,20 +34,23 @@ describe("pedersen", () => {
     fixtures.commit.forEach(f => {
       const blind = Buffer.from(f.blind, "hex");
       const generator = Buffer.from(f.generator, "hex");
-      assert.deepEqual(commit(blind, f.value, generator).toString("hex"), f.expected);
+      assert.deepEqual(
+        commit(blind, f.value, generator).toString("hex"),
+        f.expected
+      );
     });
   });
 
   it("serialize commit", () => {
     fixtures.commitSerialize.forEach(f => {
-      const commitment = Buffer.from(f.expected, "hex");
+      const commitment = Buffer.from(f.commit, "hex");
       assert.deepEqual(commitSerialize(commitment).toString("hex"), f.expected);
     });
   });
 
   it("parse commit", () => {
     fixtures.commitParse.forEach(f => {
-      const commitment = Buffer.from(f.expected, "hex");
+      const commitment = Buffer.from(f.input, "hex");
       assert.deepEqual(commitParse(commitment).toString("hex"), f.expected);
     });
   });

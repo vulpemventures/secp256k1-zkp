@@ -46,7 +46,10 @@ describe("range proof", () => {
       const commit = Buffer.from(f.commit, "hex");
       const generator = Buffer.from(f.generator, "hex");
       const extraCommit = Buffer.from(f.extraCommit, "hex");
-      assert.deepEqual(verify(commit, proof, generator, extraCommit), f.expected);
+      assert.deepEqual(
+        verify(commit, proof, generator, extraCommit),
+        f.expected
+      );
     });
   });
 
