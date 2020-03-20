@@ -14,8 +14,9 @@ EXPORTED_METHODS='["ccall", "cwrap", "getValue", "setValue"]'
 # Set DEBUG environment variable to 1 to enable DEBUG builds (RELEASE build is default).
 RELEASE_FLAGS="-O3 --memory-init-file 0"
 DEBUG_FLAGS="-g --memory-init-file 0 --closure 0 -s ASSERTIONS=1"
+TARGET_SCRIPT_NAME_NODE="libsecp256k1.js"
+TARGET_SCRIPT_NAME_WEB="libsecp256k1.web.js"
 
-TARGET_SCRIPT_NAME="libsecp256k1.js"
 INNER_BUILD_DIR_NAME="secp256k1-zkp"
 
 #########################################
@@ -62,11 +63,9 @@ if [ "$DEBUG" -eq "1" ]
 then
     EMCC_DEBUG=1
     FINAL_PASS_FLAGS="$DEBUG_FLAGS"
-    PASS_TO_CONFIGURE=""
 else
     EMCC_DEBUG=0
     FINAL_PASS_FLAGS="$RELEASE_FLAGS"
-    PASS_TO_CONFIGURE=""
 fi
 EMCC_CFLAGS="-Wno-warn-absolute-paths" # Not working for some reason
 ENVIRONMENT_EXPORT_COMMANDS="export EMMAKEN_CFLAGS=\"${EMCC_CFLAGS}\"; export EMCC_DEBUG=${EMCC_DEBUG}"
@@ -103,7 +102,7 @@ mkdir -p "${INNER_BUILD_DIR}"
 echo "${COL}Entering \"${INNER_BUILD_DIR}\"${NC}"
 cd "${INNER_BUILD_DIR}"
 export CFLAGS="-I ${INNER_BUILD_DIR}/src"
-emconfigure "${SECP256K1_SOURCE_DIR}/configure" ${PASS_TO_CONFIGURE} --with-field=32bit --with-scalar=32bit --with-bignum=no --with-asm=no --enable-tests=no "$@"
+emconfigure "${SECP256K1_SOURCE_DIR}/configure" --with-field=32bit --with-scalar=32bit --with-bignum=no --with-asm=no --enable-tests=no "$@"
 rm -f a.out*
 echo "${COL}Exiting \"${INNER_BUILD_DIR}\"${NC}"
 cd ${BUILD_DIR}
@@ -145,13 +144,17 @@ cat >Makefile <<EOL
 
 default: install
 
-all: ${TARGET_SCRIPT_NAME}
+install: ${TARGET_SCRIPT_NAME_NODE}
+	-mv "${TARGET_SCRIPT_NAME_NODE}" "${SOURCE_DIR}/${TARGET_SCRIPT_NAME_NODE}"
 
-install: all
-	-mv "${TARGET_SCRIPT_NAME}" "${SOURCE_DIR}/${TARGET_SCRIPT_NAME}"
+install-web: ${TARGET_SCRIPT_NAME_WEB}
+	-mv "${TARGET_SCRIPT_NAME_WEB}" "${SOURCE_DIR}/${TARGET_SCRIPT_NAME_WEB}"
 
-${TARGET_SCRIPT_NAME}: ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o
-	EMCC_CLOSURE_ARGS="--language_in ECMASCRIPT6 --language_out ES5" emcc "${SOURCE_DIR}/main.c" -o ${TARGET_SCRIPT_NAME} ${FINAL_PASS_FLAGS}
+${TARGET_SCRIPT_NAME_NODE}: ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o
+	EMCC_CLOSURE_ARGS="--language_in ECMASCRIPT6 --language_out ES5" emcc "${SOURCE_DIR}/main.c" -o ${TARGET_SCRIPT_NAME_NODE} ${FINAL_PASS_FLAGS}
+
+${TARGET_SCRIPT_NAME_WEB}: ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o
+	EMCC_CLOSURE_ARGS="--language_in ECMASCRIPT6 --language_out ES5" emcc "${SOURCE_DIR}/main.c" -o ${TARGET_SCRIPT_NAME_WEB} ${FINAL_PASS_FLAGS} -s ENVIRONMENT=web
 
 ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o:
 	${ENVIRONMENT_EXPORT_COMMANDS}
@@ -159,9 +162,9 @@ ${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o:
 
 clean:
 	make -C "${INNER_BUILD_DIR}" clean
-	-rm -f ${SOURCE_DIR}/${TARGET_SCRIPT_NAME} ${SOURCE_DIR}/${TARGET_SCRIPT_NAME}.mem
+	-rm -f ${SOURCE_DIR}/${TARGET_SCRIPT_NAME_NODE} ${SOURCE_DIR}/${TARGET_SCRIPT_NAME_WEB}
 
 veryclean:
 	-rm -rf ${INNER_BUILD_DIR}
-	-rm -f ${SOURCE_DIR}/${TARGET_SCRIPT_NAME} ${SOURCE_DIR}/${TARGET_SCRIPT_NAME}.mem Makefile
+	-rm -f ${SOURCE_DIR}/${TARGET_SCRIPT_NAME_NODE} ${SOURCE_DIR}/${TARGET_SCRIPT_NAME_WEB} Makefile
 EOL
