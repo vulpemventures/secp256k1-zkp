@@ -15,7 +15,7 @@ $ git submodule update --init
 $ docker build -t secp256k1-js .
 $ npm run configure
 $ npm run make
-$ nom run make-web # compile lib for browser
+$ npm run make-web # compile lib for browser
 $ npm run test
 ```
 
