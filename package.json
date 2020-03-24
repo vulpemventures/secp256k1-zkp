@@ -11,9 +11,12 @@
     "configure": "docker run -t -v $(pwd):/src --rm secp256k1-js emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes",
     "make": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make",
     "make-web": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make install-web",
-    "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
     "lint": "npx eslint lib",
-    "prettier": "npx prettier '{lib,test}/**/*.js' --ignore-path ./.prettierignore --write > /dev/null 2>&1"
+    "prettier": "npx prettier '{lib,test}/**/*.js' --ignore-path ./.prettierignore",
+    "format": "npm run prettier -- --write",
+    "format:ci": "npm run prettier -- --check",
+    "test": "npm run format:ci && npm run lint && npm run unit",
+    "unit": "npx mocha -t 6000 test/**/*.js"
   },
   "browser": {
     "./src/libsecp256k1.js": "./src/libsecp256k1.web.js"
