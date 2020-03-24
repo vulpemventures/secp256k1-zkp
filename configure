@@ -92,23 +92,24 @@ fi
 # Note that make clean in outer build folder will not remove the Makefile from the inner build folder.
 # To properly clean so that running configure on outer build folder re-runs configure on inner build folder, use make veryclean.
 
-# if [ -e "${INNER_BUILD_DIR}/Makefile" ]
-# then
-#     echo "${COL}\"${BUILD_DIR}/Makefile\" already exists${NC}"
-#     echo "${COL}Will not run configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
-# else
-echo "${COL}Running configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
-mkdir -p "${INNER_BUILD_DIR}"
-echo "${COL}Entering \"${INNER_BUILD_DIR}\"${NC}"
-cd "${INNER_BUILD_DIR}"
-export CFLAGS="-I ${INNER_BUILD_DIR}/src"
-emconfigure "${SECP256K1_SOURCE_DIR}/configure" --with-field=32bit --with-scalar=32bit --with-bignum=no --with-asm=no --enable-tests=no "$@"
-rm -f a.out*
-echo "${COL}Exiting \"${INNER_BUILD_DIR}\"${NC}"
-cd ${BUILD_DIR}
-echo "${COL}Done with configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
-# fi
-echo ""
+if [ -e "${INNER_BUILD_DIR}/Makefile" ]
+then
+    echo "${COL}\"${BUILD_DIR}/Makefile\" already exists${NC}"
+    echo "${COL}Will not run configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
+else
+    echo "${COL}Running configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
+    mkdir -p "${INNER_BUILD_DIR}"
+    echo "${COL}Entering \"${INNER_BUILD_DIR}\"${NC}"
+    cd "${INNER_BUILD_DIR}"
+    export CFLAGS="-I ${INNER_BUILD_DIR}/src"
+    emconfigure "${SECP256K1_SOURCE_DIR}/configure" --with-field=32bit --with-scalar=32bit --with-bignum=no --with-asm=no --enable-tests=no "$@"
+    rm -f a.out*
+    echo "${COL}Exiting \"${INNER_BUILD_DIR}\"${NC}"
+    cd ${BUILD_DIR}
+    echo "${COL}Done with configure on \"${SECP256K1_SOURCE_DIR}\"${NC}"
+    # fi
+    echo ""
+fi
 
 # Generate EXPORTED_FUNCTIONS list to be used by final emcc compilation to Javascript
 EXPORT_TEXT="'["
@@ -137,8 +138,8 @@ if [ -e  "${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o" ]
 then
     touch "${INNER_BUILD_DIR_NAME}/src/libsecp256k1_la-secp256k1.o"
 fi
-# EXPORTED_FUNCTIONS=${EXPORT_TEXT}
-FINAL_PASS_FLAGS="${FINAL_PASS_FLAGS} -I${INNER_BUILD_DIR}/include -L${INNER_BUILD_DIR}/.libs -lsecp256k1 -s NO_EXIT_RUNTIME=1 -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='${EXPORTED_METHODS}'"
+
+FINAL_PASS_FLAGS="${FINAL_PASS_FLAGS} -I${INNER_BUILD_DIR}/include -L${INNER_BUILD_DIR}/.libs -lsecp256k1 -s NO_EXIT_RUNTIME=1 -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s MODULARIZE=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='${EXPORTED_METHODS}'"
 cat >Makefile <<EOL
 .PHONY: default all install clean veryclean
 
