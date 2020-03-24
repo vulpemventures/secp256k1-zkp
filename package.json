@@ -12,7 +12,8 @@
     "make": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make",
     "make-web": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make install-web",
     "test": "npm run lint -- --quiet && mocha -t 6000 test/**/*.js",
-    "lint": "npx eslint lib"
+    "lint": "npx eslint lib",
+    "prettier": "npx prettier '{lib,test}/**/*.js' --ignore-path ./.prettierignore --write > /dev/null 2>&1"
   },
   "browser": {
     "./src/libsecp256k1.js": "./src/libsecp256k1.web.js"
@@ -32,7 +33,9 @@
     "long": "^4.0.0"
   },
   "devDependencies": {
+    "assert": "^2.0.0",
     "eslint": "^6.8.0",
-    "mocha": "^7.1.1"
+    "mocha": "^7.1.1",
+    "prettier": "^2.0.2"
   }
 }
