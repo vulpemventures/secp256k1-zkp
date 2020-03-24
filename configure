@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # C functions to export to Javascript
 EXPORTS=(   secp256k1_context_create\
             secp256k1_context_destroy\
@@ -141,7 +143,7 @@ fi
 
 FINAL_PASS_FLAGS="${FINAL_PASS_FLAGS} -I${INNER_BUILD_DIR}/include -L${INNER_BUILD_DIR}/.libs -lsecp256k1 -s NO_EXIT_RUNTIME=1 -s WASM=0 -s LINKABLE=1 -s EXPORT_ALL=1 -s MODULARIZE=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='${EXPORTED_METHODS}'"
 cat >Makefile <<EOL
-.PHONY: default all install clean veryclean
+.PHONY: default install install-web clean veryclean
 
 default: install
 
