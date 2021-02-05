@@ -24,7 +24,33 @@ $ ./bash scripts/compile_wasm_docker
 $ npx browserify lib/index.js --standalone secp256k1 > bundle.js
 ```
 
+
+## Usage
+
+
+### Install
+
+```sh
+$ npm install vulpemventures/secp256k1-zkp
+# or with yarn
+$ yarn add vulpemventures/secp256k1-zkp
+```
+
+### Import
+
+```js
+const secp256k1 = require('sec');
+
+// secp256k1 returns a Promise that must be resolved before using the exported methods
+const { rangeproof, surjectionproof } = await secp256k1(); 
+
+rangeproof.rewind(...)
+surjectionproof.verify(...)
+```
+
 ## Documentation
+
+
 
 ### Ecdh
 
@@ -259,8 +285,6 @@ Verify a surjection proof.
 ---
 
 ## Credit
-
-This is a partially derived work of https://github.com/EOSIO/eosjs-secp256k1.
 
 This library uses the native library [secp256k1-zkp](https://github.com/ElementsProject/secp256k1-zkp) by the Elements Project developers, including derivatives of its tests and test vectors.
 
