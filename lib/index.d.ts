@@ -1,6 +1,4 @@
-declare module ecdh {
-  function ecdh(pubkey: Buffer, scalar: Buffer): Buffer;
-}
+declare function ecdh(pubkey: Buffer, scalar: Buffer): Buffer;
 declare module generator {
   function generateBlinded(key: Buffer, blind: Buffer): Buffer;
   function parse(input: Buffer): Buffer;
