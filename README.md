@@ -39,7 +39,7 @@ $ yarn add vulpemventures/secp256k1-zkp
 ### Import
 
 ```js
-const secp256k1 = require('sec');
+const secp256k1 = require('secp256k1-zkp');
 
 // secp256k1 returns a Promise that must be resolved before using the exported methods
 const { rangeproof, surjectionproof } = await secp256k1(); 
