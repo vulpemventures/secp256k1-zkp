@@ -1,4 +1,5 @@
-const assert = require('assert');
+const chai = require('chai');
+const assert = chai.assert;
 
 const secp256k1 = require('../lib');
 const fixtures = require('./fixtures/generator.json');

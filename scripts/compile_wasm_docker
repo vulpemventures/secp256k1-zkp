@@ -18,7 +18,6 @@ docker exec linux-build bash build_wasm
 # Copy the artifacts from the contianer to local directory
 rm -rf dist && mkdir -p dist
 docker cp linux-build:/build/dist/secp256k1-zkp.js ./dist
-docker cp linux-build:/build/dist/secp256k1-zkp.wasm ./dist
 
 docker stop linux-build
 docker rm linux-build

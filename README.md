@@ -12,8 +12,10 @@ This library is under development, and, like the [secp256k1-zkp](https://github.
 ```sh
 # Install node dependencies
 $ npm install
+
 # Pull the latest secp256k1-zkp as a git submodule
 $ git submodule update --init
+
 # This will copy secp256k1-zkp folder along with the main.c wrapper and build with emscripten inside the docker container
 $ ./bash scripts/compile_wasm_docker
 ```
@@ -21,9 +23,19 @@ $ ./bash scripts/compile_wasm_docker
 ## Bundle for browsers
 
 ```sh
-$ npx browserify lib/index.js --standalone secp256k1 > bundle.js
+$ npx browserify lib/index.js --standalone secp256k1 > bundle.browser.js
 ```
 
+## Test
+
+```sh
+# lint & prettier & node
+$ npm run test
+# Only node
+$ npm run unit:node
+# Only browser
+$ npm run unit:web
+```
 
 ## Usage
 
