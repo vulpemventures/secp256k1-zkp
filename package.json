@@ -1,25 +1,24 @@
 {
   "name": "secp256k1-zkp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Essential methods of the secp256k1-zkp lib exported to JS for handling Elements confidential transactions",
   "main": "./lib/index",
   "types": "./lib/index.d.ts",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=12.0.0"
   },
+  "files": [
+    "lib/*.{js,ts}",
+    "dist/*"
+  ],
   "scripts": {
-    "configure": "docker run -t -v $(pwd):/src --rm secp256k1-js emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes",
-    "make": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make",
-    "make-web": "docker run -t -v $(pwd):/src --rm secp256k1-js emmake make install-web",
+    "compile": "bash ./scripts/compile_wasm_docker",
     "lint": "npx eslint lib",
     "prettier": "npx prettier '{lib,test}/**/*.js' --ignore-path ./.prettierignore",
     "format": "npm run prettier -- --write",
     "format:ci": "npm run prettier -- --check",
     "test": "npm run format:ci && npm run lint && npm run unit",
     "unit": "npx mocha -t 6000 test/**/*.js"
-  },
-  "browser": {
-    "./src/libsecp256k1.js": "./src/libsecp256k1.web.js"
   },
   "repository": {
     "type": "git",

@@ -10,30 +10,18 @@ This library is under development, and, like the [secp256k1-zkp](https://github.
 ### Build steps (with Docker)
 
 ```sh
+# Install node dependencies
 $ npm install
+# Pull the latest secp256k1-zkp as a git submodule
 $ git submodule update --init
-$ docker build -t secp256k1-js .
-$ npm run configure
-$ npm run make
-$ npm run make-web # compile lib for browser
-$ npm run test
+# This will copy secp256k1-zkp folder along with the main.c wrapper and build with emscripten inside the docker container
+$ ./bash scripts/compile_wasm_docker
 ```
 
-### Build steps (without Docker)
+## Bundle for browsers
 
 ```sh
-$ npm install
-$ git submodule update --init
-$ emconfigure ./configure src secp256k1-zkp --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes
-$ emmake make
-$ emmake make install-web # compile lib for browser
-$ npm run test
-```
-
-## Bundle
-
-```sh
-$ browserify lib/index.js --standalone secp256k1 > bundle.js
+$ npx browserify lib/index.js --standalone secp256k1 > bundle.js
 ```
 
 ## Documentation
