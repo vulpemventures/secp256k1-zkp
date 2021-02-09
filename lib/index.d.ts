@@ -1,4 +1,4 @@
-declare function ecdh(pubkey: Buffer, scalar: Buffer): Buffer;
+type Ecdh = (pubkey: Buffer, scalar: Buffer) => Buffer;
 
 interface Generator {
   generateBlinded(key: Buffer, blind: Buffer): Buffer;
@@ -86,7 +86,7 @@ interface SurjectionProof {
   ) => boolean;
 }
 
-declare function secp256k1(): Promise<{ surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
+declare function secp256k1(): Promise<{ ecdh: Ecdh, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
 
 export default secp256k1
 
