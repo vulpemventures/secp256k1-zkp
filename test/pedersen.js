@@ -1,21 +1,32 @@
-const assert = require('assert');
+const chai = require('chai');
+const assert = chai.assert;
 
-const Module = require('../lib');
-const {
-  commit,
-  commitParse,
-  commitSerialize,
-  blindSum,
-  verifySum,
-  blindGeneratorBlindSum,
-} = Module.pedersen;
+const secp256k1 = require('../lib');
 const fixtures = require('./fixtures/pedersen.json');
 
 describe('pedersen', () => {
+  let commit,
+    commitParse,
+    commitSerialize,
+    blindSum,
+    verifySum,
+    blindGeneratorBlindSum;
+
+  before(async () => {
+    ({
+      commit,
+      commitParse,
+      commitSerialize,
+      blindSum,
+      verifySum,
+      blindGeneratorBlindSum,
+    } = (await secp256k1()).pedersen);
+  });
+
   it('blind sum', () => {
     fixtures.blindSum.forEach((f) => {
       const blinds = f.blinds.map((b) => Buffer.from(b, 'hex'));
-      assert.deepEqual(
+      assert.deepStrictEqual(
         blindSum(blinds, f.nNegatives).toString('hex'),
         f.expected
       );
@@ -28,7 +39,7 @@ describe('pedersen', () => {
       const negativeCommits = f.negativeCommits.map((b) =>
         Buffer.from(b, 'hex')
       );
-      assert.deepEqual(verifySum(commits, negativeCommits), f.expected);
+      assert.deepStrictEqual(verifySum(commits, negativeCommits), f.expected);
     });
   });
 
@@ -36,7 +47,7 @@ describe('pedersen', () => {
     fixtures.commit.forEach((f) => {
       const blind = Buffer.from(f.blind, 'hex');
       const generator = Buffer.from(f.generator, 'hex');
-      assert.deepEqual(
+      assert.deepStrictEqual(
         commit(blind, f.value, generator).toString('hex'),
         f.expected
       );
@@ -46,14 +57,20 @@ describe('pedersen', () => {
   it('serialize commit', () => {
     fixtures.commitSerialize.forEach((f) => {
       const commitment = Buffer.from(f.commit, 'hex');
-      assert.deepEqual(commitSerialize(commitment).toString('hex'), f.expected);
+      assert.deepStrictEqual(
+        commitSerialize(commitment).toString('hex'),
+        f.expected
+      );
     });
   });
 
   it('parse commit', () => {
     fixtures.commitParse.forEach((f) => {
       const commitment = Buffer.from(f.input, 'hex');
-      assert.deepEqual(commitParse(commitment).toString('hex'), f.expected);
+      assert.deepStrictEqual(
+        commitParse(commitment).toString('hex'),
+        f.expected
+      );
     });
   });
 

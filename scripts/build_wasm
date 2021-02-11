@@ -1,0 +1,44 @@
+#! /usr/bin/env bash
+
+set -e
+
+## parralelize. Default 4 jobs, check based on current available cores with cpuinfo
+num_jobs=4
+if [ -f /proc/cpuinfo ]; then
+    num_jobs=$(grep ^processor /proc/cpuinfo | wc -l)
+fi
+
+# optmization level
+OPTIMIZATION_LEVEL=s
+# C functions to export to Javascript
+EXTRA_EXPORTED_RUNTIME_METHODS="['getValue', 'setValue', 'ccall']"
+EXPORTED_FUNCTIONS="['_free', '_malloc', '_ecdh', '_generator_generate_blinded', '_generator_parse', '_generator_serialize', '_pedersen_blind_generator_blind_sum', '_pedersen_commitment_parse', '_pedersen_commitment_serialize', '_pedersen_commit', '_pedersen_blind_sum', '_pedersen_verify_tally', '_rangeproof_sign', '_rangeproof_info', '_rangeproof_verify', '_rangeproof_rewind', '_surjectionproof_parse', '_surjectionproof_serialize', '_surjectionproof_initialize', '_surjectionproof_generate', '_surjectionproof_verify']"
+
+SECP256K1_SOURCE_DIR=secp256k1-zkp
+
+cd ${SECP256K1_SOURCE_DIR}
+
+# run autogen
+./autogen.sh
+
+# Compile secp256k1 to bitcode
+emconfigure ./configure --with-field=32bit --with-scalar=32bit --with-bignum=no --enable-tests=no --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes
+emmake make -j $num_jobs
+
+# go bakc to the root folder
+cd ..
+
+# Create a folder for artifacts
+mkdir -p dist
+
+# Compile to wasm
+emcc -O$OPTIMIZATION_LEVEL \
+    -s "EXTRA_EXPORTED_RUNTIME_METHODS=${EXTRA_EXPORTED_RUNTIME_METHODS}" \
+    -s "EXPORTED_FUNCTIONS=${EXPORTED_FUNCTIONS}" \
+    -s NO_FILESYSTEM=1 \
+    -s MODULARIZE=1 \
+    -s SINGLE_FILE=1 \
+    -I${SECP256K1_SOURCE_DIR}/include -L${SECP256K1_SOURCE_DIR}/.libs -lsecp256k1 \
+    ./main.c \
+    "${SECP256K1_SOURCE_DIR}/src/libsecp256k1_la-secp256k1.o" \
+    -o ./dist/secp256k1-zkp.js

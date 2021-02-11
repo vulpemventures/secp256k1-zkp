@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Build the container
+docker build -t secp256k1-wasm .
+# Run the container
+docker run --name linux-build -d -i secp256k1-wasm
+
+# Copy the secp256k1 folder inside the container
+docker cp ./secp256k1-zkp/. linux-build:/build/secp256k1-zkp
+# Copy the C wrapper
+docker cp ./lib/main.c linux-build:/build
+# Copy the custom build script inside the container
+docker cp ./scripts/build_wasm linux-build:/build
+
+# Compile to wasm target
+docker exec linux-build bash build_wasm
+
+# Copy the artifacts from the contianer to local directory
+rm -rf dist && mkdir -p dist
+docker cp linux-build:/build/dist/secp256k1-zkp.js ./dist
+
+docker stop linux-build
+docker rm linux-build
+#docker rmi secp256k1-wasm

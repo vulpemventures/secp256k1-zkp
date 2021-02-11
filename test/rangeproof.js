@@ -1,10 +1,16 @@
-const assert = require('assert');
+const chai = require('chai');
+const assert = chai.assert;
 
-const Module = require('../lib');
-const { sign, info, verify, rewind } = Module.rangeproof;
+const secp256k1 = require('../lib');
 const fixtures = require('./fixtures/rangeproof.json');
 
 describe('range proof', () => {
+  let sign, info, verify, rewind;
+
+  before(async () => {
+    ({ sign, info, verify, rewind } = (await secp256k1()).rangeproof);
+  });
+
   it('proof sign', () => {
     fixtures.sign.forEach((f) => {
       const commit = Buffer.from(f.commit, 'hex');
@@ -25,7 +31,7 @@ describe('range proof', () => {
         message,
         extraCommit
       );
-      assert.deepEqual(proof.toString('hex'), f.expected);
+      assert.deepStrictEqual(proof.toString('hex'), f.expected);
     });
   });
 
@@ -33,10 +39,10 @@ describe('range proof', () => {
     fixtures.info.forEach((f) => {
       const proof = Buffer.from(f.proof, 'hex');
       const proofInfo = info(proof);
-      assert.deepEqual(proofInfo.exp, f.expected.exp);
-      assert.deepEqual(proofInfo.mantissa, f.expected.mantissa);
-      assert.deepEqual(proofInfo.minValue, f.expected.minValue);
-      assert.deepEqual(proofInfo.maxValue, f.expected.maxValue);
+      assert.deepStrictEqual(proofInfo.exp, f.expected.exp);
+      assert.deepStrictEqual(proofInfo.mantissa, f.expected.mantissa);
+      assert.deepStrictEqual(proofInfo.minValue, f.expected.minValue);
+      assert.deepStrictEqual(proofInfo.maxValue, f.expected.maxValue);
     });
   });
 
@@ -46,7 +52,7 @@ describe('range proof', () => {
       const commit = Buffer.from(f.commit, 'hex');
       const generator = Buffer.from(f.generator, 'hex');
       const extraCommit = Buffer.from(f.extraCommit, 'hex');
-      assert.deepEqual(
+      assert.deepStrictEqual(
         verify(commit, proof, generator, extraCommit),
         f.expected
       );
@@ -60,11 +66,14 @@ describe('range proof', () => {
       const generator = Buffer.from(f.generator, 'hex');
       const extraCommit = Buffer.from(f.extraCommit, 'hex');
       const res = rewind(commit, proof, commit, generator, extraCommit);
-      assert.deepEqual(res.value, f.expected.value);
-      assert.deepEqual(res.minValue, f.expected.minValue);
-      assert.deepEqual(res.maxValue, f.expected.maxValue);
-      assert.deepEqual(res.message.toString('hex'), f.expected.message);
-      assert.deepEqual(res.blindFactor.toString('hex'), f.expected.blindFactor);
+      assert.deepStrictEqual(res.value, f.expected.value);
+      assert.deepStrictEqual(res.minValue, f.expected.minValue);
+      assert.deepStrictEqual(res.maxValue, f.expected.maxValue);
+      assert.deepStrictEqual(res.message.toString('hex'), f.expected.message);
+      assert.deepStrictEqual(
+        res.blindFactor.toString('hex'),
+        f.expected.blindFactor
+      );
     });
   });
 });

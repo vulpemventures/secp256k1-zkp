@@ -1,10 +1,18 @@
-const assert = require('assert');
+const chai = require('chai');
+const assert = chai.assert;
 
-const Module = require('../lib');
-const { verify, generate, serialize, initialize } = Module.surjectionproof;
+const secp256k1 = require('../lib');
 const fixtures = require('./fixtures/surjectionproof.json');
 
 describe('surjection proof', () => {
+  let verify, generate, serialize, initialize;
+
+  before(async () => {
+    ({ verify, generate, serialize, initialize } = (
+      await secp256k1()
+    ).surjectionproof);
+  });
+
   it('initialize proof', () => {
     fixtures.initialize.forEach((f) => {
       const seed = Buffer.from(f.seed, 'hex');
