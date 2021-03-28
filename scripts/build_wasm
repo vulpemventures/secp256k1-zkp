@@ -38,6 +38,7 @@ emcc -O$OPTIMIZATION_LEVEL \
     -s NO_FILESYSTEM=1 \
     -s MODULARIZE=1 \
     -s SINGLE_FILE=1 \
+    -s ALLOW_MEMORY_GROWTH=1 \
     -I${SECP256K1_SOURCE_DIR}/include -L${SECP256K1_SOURCE_DIR}/.libs -lsecp256k1 \
     ./main.c \
     "${SECP256K1_SOURCE_DIR}/src/libsecp256k1_la-secp256k1.o" \

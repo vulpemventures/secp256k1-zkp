@@ -17,7 +17,7 @@ $ npm install
 $ git submodule update --init
 
 # This will copy secp256k1-zkp folder along with the main.c wrapper and build with emscripten inside the docker container
-$ ./bash scripts/compile_wasm_docker
+$ bash scripts/compile_wasm_docker
 ```
 
 ## Bundle for browsers

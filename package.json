@@ -1,5 +1,5 @@
 {
-  "name": "secp256k1-zkp",
+  "name": "@vulpemventures/secp256k1-zkp",
   "version": "2.0.0",
   "description": "Essential methods of the secp256k1-zkp lib exported to JS for handling Elements confidential transactions",
   "main": "./lib/index",
@@ -43,5 +43,9 @@
     "http-server": "^0.12.3",
     "mocha": "^7.1.1",
     "prettier": "^2.0.2"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }
