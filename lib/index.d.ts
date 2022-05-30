@@ -1,5 +1,11 @@
 type Ecdh = (pubkey: Buffer, scalar: Buffer) => Buffer;
 
+interface Ec {
+  prvkeyNegate: (key: Buffer) => Buffer;
+  prvkeyTweakAdd: (key: Buffer, tweak: Buffer) => Buffer;
+  prvkeyTweakMul: (key: Buffer, tweak: Buffer) => Buffer;
+}
+
 interface Generator {
   generateBlinded(key: Buffer, blind: Buffer): Buffer;
   parse(input: Buffer): Buffer;
@@ -86,7 +92,7 @@ interface SurjectionProof {
   ) => boolean;
 }
 
-declare function secp256k1(): Promise<{ ecdh: Ecdh, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
+declare function secp256k1(): Promise<{ ecdh: Ecdh, ec: Ec, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
 
 export default secp256k1
 
