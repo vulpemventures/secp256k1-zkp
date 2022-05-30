@@ -23,6 +23,20 @@ int ecdh(unsigned char *output, const unsigned char *pubkey, const unsigned char
   return ret;
 }
 
+int generator_generate(unsigned char *generator, const unsigned char *random_seed32)
+{
+  secp256k1_generator gen;
+  memcpy(&(gen.data), generator, 64);
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  int ret = secp256k1_generator_generate(ctx, &gen, random_seed32);
+  if (ret == 1)
+  {
+    memcpy(generator, gen.data, 64);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
 int generator_generate_blinded(unsigned char *gen_data, const unsigned char *key32, const unsigned char *blind32)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);

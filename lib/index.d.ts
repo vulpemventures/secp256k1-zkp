@@ -7,6 +7,7 @@ interface Ec {
 }
 
 interface Generator {
+  generate: (seed: Buffer) => Buffer;
   generateBlinded(key: Buffer, blind: Buffer): Buffer;
   parse(input: Buffer): Buffer;
   serialize(generator: Buffer): Buffer;
