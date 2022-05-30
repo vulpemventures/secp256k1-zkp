@@ -257,3 +257,24 @@ int surjectionproof_verify(const size_t *n_inputs, const unsigned char *used_inp
   secp256k1_context_destroy(ctx);
   return ret;
 }
+
+int ec_seckey_negate(unsigned char *key) {
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  int ret = secp256k1_ec_seckey_negate(ctx, key);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_seckey_tweak_add(unsigned char *key, const unsigned char *tweak) {
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  int ret = secp256k1_ec_seckey_tweak_add(ctx, key, tweak);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_seckey_tweak_mul(unsigned char *key, const unsigned char *tweak) {
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  int ret = secp256k1_ec_seckey_tweak_mul(ctx, key, tweak);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
