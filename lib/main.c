@@ -155,7 +155,7 @@ int rangeproof_sign(unsigned char *proof, size_t *plen, uint64_t min_value, cons
   memcpy(&(commit.data), commit_data, 64);
   secp256k1_generator gen;
   memcpy(&(gen.data), generator_data, 64);
-  int ret = secp256k1_rangeproof_sign(ctx, proof, plen, min_value, &commit, blind, nonce, exp, min_bits, value, message, msg_len, extra_commit, extra_commit_len, &gen);
+  int ret = secp256k1_rangeproof_sign(ctx, proof, plen, min_value, &commit, blind, nonce, exp, min_bits, value, msg_len > 0 ? message : NULL, msg_len, extra_commit_len > 0 ? extra_commit : NULL, extra_commit_len, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
