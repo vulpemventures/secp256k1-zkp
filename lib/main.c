@@ -200,6 +200,11 @@ int surjectionproof_parse(size_t *n_inputs, unsigned char *used_inputs, unsigned
   memcpy(&(proof.data), data, 8224);
   int ret = secp256k1_surjectionproof_parse(ctx, &proof, input, inputlen);
   secp256k1_context_destroy(ctx);
+  if (ret > 0) {
+    memcpy(n_inputs, &(proof.n_inputs), sizeof(proof.n_inputs));
+    memcpy(used_inputs, &(proof.used_inputs), 32);
+    memcpy(data, &(proof.data), 8224);
+  }
   return ret;
 }
 

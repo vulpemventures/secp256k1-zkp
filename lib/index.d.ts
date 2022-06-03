@@ -68,6 +68,11 @@ interface SurjectionProof {
     usedInputs: Buffer;
     data: Buffer;
   }) => Buffer;
+  parse: (proof: Buffer) => {
+    nInputs: number;
+    usedInputs: Buffer;
+    data: Buffer;
+  };
   initialize: (
     inputTags: Array<Buffer>,
     inputTagsToUse: number,
