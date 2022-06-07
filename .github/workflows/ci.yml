@@ -25,12 +25,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Lint
-        run: |
-          npm run format:ci
-          npm run lint
-
-      - name: Unit Test
-        run: |
-          npm run unit:node
-          npm run unit:web
+      - name: Lint & Test
+        run: npm run test
