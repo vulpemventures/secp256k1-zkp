@@ -1,7 +1,0 @@
-sudo: false
-language: node_js
-node_js:
-  - '10'
-env:
-  - TEST_SUITE=test
-script: npm run-script $TEST_SUITE
