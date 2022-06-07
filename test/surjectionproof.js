@@ -8,9 +8,22 @@ describe('surjection proof', () => {
   let verify, generate, serialize, initialize;
 
   before(async () => {
-    ({ verify, generate, serialize, initialize } = (
+    ({ parse, verify, generate, serialize, initialize } = (
       await secp256k1()
     ).surjectionproof);
+  });
+
+  it('parse proof', () => {
+    fixtures.parse.forEach((f) => {
+      const proof = Buffer.from(f.proof, 'hex');
+      const res = parse(proof);
+      assert.deepStrictEqual(res.nInputs, f.expected.nInputs);
+      assert.deepStrictEqual(
+        res.usedInputs.toString('hex'),
+        f.expected.usedInputs
+      );
+      assert.deepStrictEqual(res.data.toString('hex'), f.expected.data);
+    });
   });
 
   it('initialize proof', () => {

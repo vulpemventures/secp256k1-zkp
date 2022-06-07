@@ -1,0 +1,29 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    name: Build, lint, and test on Node ${{ matrix.node }}
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["12.x", "14.x", "16.x"]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint & Test
+        run: npm run test
