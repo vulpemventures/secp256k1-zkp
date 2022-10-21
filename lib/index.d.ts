@@ -98,7 +98,25 @@ interface SurjectionProof {
   ) => boolean;
 }
 
+interface ZKP { 
+  ecdh: Ecdh, 
+  ec: Ec, 
+  surjectionproof: SurjectionProof, 
+  rangeproof: RangeProof, 
+  pedersen: Pedersen, 
+  generator: Generator 
+}
+
 declare function secp256k1(): Promise<{ ecdh: Ecdh, ec: Ec, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
 
-export default secp256k1
+export {
+  ZKP,
+  Ec,
+  Ecdh,
+  SurjectionProof,
+  RangeProof,
+  Pedersen,
+  Generator
+}
+export default secp256k1;
 
