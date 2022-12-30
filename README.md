@@ -54,7 +54,7 @@ $ yarn add vulpemventures/secp256k1-zkp
 const secp256k1 = require('secp256k1-zkp');
 
 // secp256k1 returns a Promise that must be resolved before using the exported methods
-const { rangeproof, surjectionproof } = await secp256k1(); 
+const { rangeproof, surjectionproof } = await secp256k1();
 
 rangeproof.rewind(...)
 surjectionproof.verify(...)
@@ -100,7 +100,7 @@ Parse a 33-byte generator byte sequence into a 64-byte raw generator.
 
 - `input` 33-byte serialized generator.
 
-#### serialzie(generator)
+#### serialize(generator)
 
 ```haskell
 serialize :: Buffer -> Buffer
