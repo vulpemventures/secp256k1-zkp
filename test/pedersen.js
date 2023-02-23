@@ -30,8 +30,8 @@ describe('pedersen', () => {
         Buffer.from(
           blindGeneratorBlindSum(
             f.values,
-            valueBlinders,
             assetBlinders,
+            valueBlinders,
             f.nInputs
           )
         ).toString('hex'),

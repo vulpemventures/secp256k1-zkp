@@ -52,7 +52,7 @@
         "402411850209",
         "888964115465"
       ],
-      "valueBlinders": [
+      "assetBlinders": [
         "686269065748c5a857c2fb4f76b28a283ebfe20c8ebd62f14eebf9cb109f0235",
         "12dff30d9161b951c3131eea628b4896534cec1fd561c15fd182e4db6c7656aa",
         "06e561259200ae50e1c2db18dc9b9979f88e0c0968aee8c91375a9f1d703a661",
@@ -70,7 +70,7 @@
         "a89a92f3f06c9cb472f0159fe3379ac2681288376289b53f7307f16c955835fa",
         "7947cae8c870d7ac8bacf0ca0de26c9f6f0ed45acd1ad1ea83308775356538d9"
       ],
-      "assetBlinders": [
+      "valueBlinders": [
         "455f6548abd2e95f5bf08c9051a7ee21cadac1df7df15f49a03363cd93da2a59",
         "3e1be9d94a83ae9c3c48a2b69b2a9df09e77185f213cb68dfd88c899ab9a4bdd",
         "d1f0b640aa3b5596d0ea8d18f1d0aaf1b5b1a2f230338b3b6cd5eab2c8eafe10",
@@ -92,43 +92,43 @@
     {
       "nInputs": 0,
       "values": ["1402118166"],
-      "assetBlinders": [],
-      "valueBlinders": ["2a4573f14ccfb1175c4a1fbcb541ef124cabbab9dce98a783fa50b300ed2d5dd"],
+      "valueBlinders": [],
+      "assetBlinders": ["2a4573f14ccfb1175c4a1fbcb541ef124cabbab9dce98a783fa50b300ed2d5dd"],
       "expected": "9a0c1464053983bf75679461de15546afc7ab51e30301cfce50960829fee4565"
     },
     {
       "nInputs": 0,
       "values": ["3638801394"],
-      "assetBlinders": [],
-      "valueBlinders": ["56e33a1674c46b1951bb01131a2adfa3165ca7841fcb0b2e540e389766bfb5cd"],
+      "valueBlinders": [],
+      "assetBlinders": ["56e33a1674c46b1951bb01131a2adfa3165ca7841fcb0b2e540e389766bfb5cd"],
       "expected": "87261e97f306cc30e9743fef0312e5ed3107b4c635e9601bc7f0c832f9268689"
     },
     {
       "nInputs": 0,
       "values": ["2211154800"],
-      "assetBlinders": [],
-      "valueBlinders": ["2c114e642f7336e6e4c99f67143710f8e8d0e790f05adb2175fe19afd7d0200f"],
+      "valueBlinders": [],
+      "assetBlinders": ["2c114e642f7336e6e4c99f67143710f8e8d0e790f05adb2175fe19afd7d0200f"],
       "expected": "e523b8f2fe9e044f4828159350596a4000fbcf12dfabfcd800ded564abf8c748"
     },
     {
       "nInputs": 0,
       "values": ["2438659112"],
-      "assetBlinders": [],
-      "valueBlinders": ["906bf458c1023e3af9c18a3284983615cc3ed7d7f529bff7a274a650d25d3ba2"],
+      "valueBlinders": [],
+      "assetBlinders": ["906bf458c1023e3af9c18a3284983615cc3ed7d7f529bff7a274a650d25d3ba2"],
       "expected": "fe14541a5a31cb9d42dbd96fae6c19695309c3431fde5289f8113ddcf9aeb34c"
     },
     {
       "nInputs": 0,
       "values": ["633090570"],
-      "assetBlinders": [],
-      "valueBlinders": ["78d892719df56ff76c6ea36f1e8e1eef9a96dd02ba6ca599f4cf6084b7338ab6"],
+      "valueBlinders": [],
+      "assetBlinders": ["78d892719df56ff76c6ea36f1e8e1eef9a96dd02ba6ca599f4cf6084b7338ab6"],
       "expected": "03ab9d48e82bae4912bceed99c77c6ecd4c1cd4f8f960512684e042d991d36f9"
     },
     {
       "nInputs": 0,
       "values": ["405385747"],
-      "assetBlinders": [],
-      "valueBlinders": ["c3446130478fc5e882712eba6eb17769b413a214689ba2e4f337366bb300cb16"],
+      "valueBlinders": [],
+      "assetBlinders": ["c3446130478fc5e882712eba6eb17769b413a214689ba2e4f337366bb300cb16"],
       "expected": "dee847143a412489a8df899443913284213c1f5aa2a4bde73d4de528e16fb683"
     }
   ]
