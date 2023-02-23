@@ -11,7 +11,10 @@ describe('ecdh', () => {
     fixtures.ecdh.forEach((f) => {
       const pubkey = Buffer.from(f.pubkey, 'hex');
       const scalar = Buffer.from(f.scalar, 'hex');
-      assert.strictEqual(ecdh(pubkey, scalar).toString('hex'), f.expected);
+      assert.strictEqual(
+        Buffer.from(ecdh(pubkey, scalar)).toString('hex'),
+        f.expected
+      );
     });
   });
 });

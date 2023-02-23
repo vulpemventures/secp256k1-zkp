@@ -12,7 +12,7 @@ fi
 OPTIMIZATION_LEVEL=s
 # C functions to export to Javascript
 EXTRA_EXPORTED_RUNTIME_METHODS="['getValue', 'setValue', 'ccall']"
-EXPORTED_FUNCTIONS="['_free', '_malloc', '_ecdh', '_generator_generate', '_generator_generate_blinded', '_generator_parse', '_generator_serialize', '_pedersen_blind_generator_blind_sum', '_pedersen_commitment_parse', '_pedersen_commitment_serialize', '_pedersen_commit', '_pedersen_blind_sum', '_pedersen_verify_tally', '_rangeproof_sign', '_rangeproof_info', '_rangeproof_verify', '_rangeproof_rewind', '_surjectionproof_parse', '_surjectionproof_serialize', '_surjectionproof_initialize', '_surjectionproof_generate', '_surjectionproof_verify', '_ec_seckey_negate', '_ec_seckey_tweak_add', '_ec_seckey_tweak_mul']"
+EXPORTED_FUNCTIONS="['_secp256k1_ecmult_gen_prec_table', '_secp256k1_pre_g', '_secp256k1_pre_g_128', '_free', '_malloc', '_ecdh', '_generator_generate', '_generator_generate_blinded', '_pedersen_blind_generator_blind_sum', '_pedersen_commitment', '_rangeproof_sign', '_rangeproof_info', '_rangeproof_verify', '_rangeproof_rewind', '_surjectionproof_initialize', '_surjectionproof_generate', '_surjectionproof_verify', '_ec_seckey_negate', '_ec_seckey_tweak_add', '_ec_seckey_tweak_mul']"
 
 SECP256K1_SOURCE_DIR=secp256k1-zkp
 
@@ -22,7 +22,7 @@ cd ${SECP256K1_SOURCE_DIR}
 ./autogen.sh
 
 # Compile secp256k1 to bitcode
-emconfigure ./configure --with-field=32bit --with-scalar=32bit --with-bignum=no --enable-tests=no --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes
+emconfigure ./configure --enable-tests=no --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-ecdh=yes
 emmake make -j $num_jobs
 
 # go bakc to the root folder

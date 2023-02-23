@@ -16,7 +16,10 @@ describe('ec', () => {
     fixtures.prvkeyNegate.forEach((f) => {
       const key = Buffer.from(f.key, 'hex');
       const res = prvkeyNegate(key);
-      assert.deepStrictEqual(prvkeyNegate(key).toString('hex'), f.expected);
+      assert.deepStrictEqual(
+        Buffer.from(prvkeyNegate(key)).toString('hex'),
+        f.expected
+      );
     });
   });
 
@@ -26,7 +29,7 @@ describe('ec', () => {
       const key = Buffer.from(f.key, 'hex');
       const tweak = Buffer.from(f.tweak, 'hex');
       assert.deepStrictEqual(
-        prvkeyTweakAdd(key, tweak).toString('hex'),
+        Buffer.from(prvkeyTweakAdd(key, tweak)).toString('hex'),
         f.expected
       );
     });
@@ -38,7 +41,7 @@ describe('ec', () => {
       const key = Buffer.from(f.key, 'hex');
       const tweak = Buffer.from(f.tweak, 'hex');
       assert.deepStrictEqual(
-        prvkeyTweakMul(key, tweak).toString('hex'),
+        Buffer.from(prvkeyTweakMul(key, tweak)).toString('hex'),
         f.expected
       );
     });

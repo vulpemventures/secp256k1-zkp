@@ -13,54 +13,37 @@ describe('surjection proof', () => {
     ).surjectionproof);
   });
 
-  it('parse proof', () => {
-    fixtures.parse.forEach((f) => {
-      const proof = Buffer.from(f.proof, 'hex');
-      const res = parse(proof);
-      assert.deepStrictEqual(res.nInputs, f.expected.nInputs);
-      assert.deepStrictEqual(
-        res.usedInputs.toString('hex'),
-        f.expected.usedInputs
-      );
-      assert.deepStrictEqual(res.data.toString('hex'), f.expected.data);
-    });
-  });
-
   it('initialize proof', () => {
     fixtures.initialize.forEach((f) => {
-      const seed = Buffer.from(f.seed, 'hex');
-      const inputTags = f.inputTags.map((t) => Buffer.from(t, 'hex'));
-      const outputTag = Buffer.from(f.outputTag, 'hex');
-      const res = initialize(
-        inputTags,
-        f.inputTagsToUse,
-        outputTag,
-        f.maxIterations,
-        seed
+      const seed = new Uint8Array(Buffer.from(f.seed, 'hex'));
+      const inputTags = f.inputTags.map(
+        (t) => new Uint8Array(Buffer.from(t, 'hex'))
       );
-      assert.deepEqual(res.proof.nInputs, f.expected.proof.nInputs);
-      assert.deepEqual(res.proof.data.toString('hex'), f.expected.proof.data);
+      const outputTag = new Uint8Array(Buffer.from(f.outputTag, 'hex'));
+      const res = initialize(inputTags, outputTag, f.maxIterations, seed);
       assert.deepEqual(
-        res.proof.usedInputs.toString('hex'),
-        f.expected.proof.usedInputs
+        Buffer.from(res.proof).toString('hex'),
+        f.expected.proof
       );
-      assert.deepEqual(res.proof.inputIndex, f.expected.proof.inputIndex);
+      assert.deepEqual(res.inputIndex, f.expected.inputIndex);
     });
   });
 
   it('generate proof', () => {
     fixtures.generate.forEach((f) => {
-      const proof = {
-        nInputs: f.proof.nInputs,
-        data: Buffer.from(f.proof.data, 'hex'),
-        usedInputs: Buffer.from(f.proof.usedInputs, 'hex'),
-      };
-      const ephemeralInputTags = f.ephemeralInputTags.map((v) =>
-        Buffer.from(v, 'hex')
+      const proof = new Uint8Array(Buffer.from(f.proof, 'hex'));
+      const ephemeralInputTags = f.ephemeralInputTags.map(
+        (v) => new Uint8Array(Buffer.from(v, 'hex'))
       );
-      const ephemeralOutputTag = Buffer.from(f.ephemeralOutputTag, 'hex');
-      const inputBlindingKey = Buffer.from(f.inputBlindingKey, 'hex');
-      const outputBlindingKey = Buffer.from(f.outputBlindingKey, 'hex');
+      const ephemeralOutputTag = new Uint8Array(
+        Buffer.from(f.ephemeralOutputTag, 'hex')
+      );
+      const inputBlindingKey = new Uint8Array(
+        Buffer.from(f.inputBlindingKey, 'hex')
+      );
+      const outputBlindingKey = new Uint8Array(
+        Buffer.from(f.outputBlindingKey, 'hex')
+      );
       const res = generate(
         proof,
         ephemeralInputTags,
@@ -69,37 +52,19 @@ describe('surjection proof', () => {
         inputBlindingKey,
         outputBlindingKey
       );
-      assert.deepEqual(res.nInputs, f.expected.proof.nInputs);
-      assert.deepEqual(res.data.toString('hex'), f.expected.proof.data);
-      assert.deepEqual(
-        res.usedInputs.toString('hex'),
-        f.expected.proof.usedInputs
-      );
-    });
-  });
-
-  it('serialize proof', () => {
-    fixtures.serialize.forEach((f) => {
-      const proof = {
-        nInputs: f.proof.nInputs,
-        data: Buffer.from(f.proof.data, 'hex'),
-        usedInputs: Buffer.from(f.proof.usedInputs, 'hex'),
-      };
-      assert.deepEqual(serialize(proof).toString('hex'), f.expected);
+      assert.deepEqual(Buffer.from(res).toString('hex'), f.expectedProof);
     });
   });
 
   it('verify proof', () => {
     fixtures.verify.forEach((f) => {
-      const proof = {
-        nInputs: f.proof.nInputs,
-        data: Buffer.from(f.proof.data, 'hex'),
-        usedInputs: Buffer.from(f.proof.usedInputs, 'hex'),
-      };
-      const ephemeralInputTags = f.ephemeralInputTags.map((v) =>
-        Buffer.from(v, 'hex')
+      const proof = new Uint8Array(Buffer.from(f.proof, 'hex'));
+      const ephemeralInputTags = f.ephemeralInputTags.map(
+        (v) => new Uint8Array(Buffer.from(v, 'hex'))
       );
-      const ephemeralOutputTag = Buffer.from(f.ephemeralOutputTag, 'hex');
+      const ephemeralOutputTag = new Uint8Array(
+        Buffer.from(f.ephemeralOutputTag, 'hex')
+      );
       assert.deepEqual(
         verify(proof, ephemeralInputTags, ephemeralOutputTag),
         f.expected
