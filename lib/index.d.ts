@@ -1,100 +1,92 @@
-type Ecdh = (pubkey: Buffer, scalar: Buffer) => Buffer;
+type Ecdh = (pubkey: Uint8Array, scalar: Uint8Array) => Uint8Array;
 
 interface Ec {
-  prvkeyNegate: (key: Buffer) => Buffer;
-  prvkeyTweakAdd: (key: Buffer, tweak: Buffer) => Buffer;
-  prvkeyTweakMul: (key: Buffer, tweak: Buffer) => Buffer;
+  prvkeyNegate: (key: Uint8Array) => Uint8Array;
+  prvkeyTweakAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  prvkeyTweakMul: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
 }
 
 interface Generator {
-  generate: (seed: Buffer) => Buffer;
-  generateBlinded(key: Buffer, blind: Buffer): Buffer;
-  parse(input: Buffer): Buffer;
-  serialize(generator: Buffer): Buffer;
+  generate: (seed: Uint8Array) => Uint8Array;
+  generateBlinded(key: Uint8Array, blinder: Uint8Array): Uint8Array;
 }
 
 interface Pedersen {
-  commit(blindFactor: Buffer, value: string, generator: Buffer): Buffer;
-  commitSerialize(commitment: Buffer): Buffer;
-  commitParse(input: Buffer): Buffer;
-  blindSum(blinds: Array<Buffer>, nneg?: number): Buffer;
-  verifySum(
-    commits: Array<Buffer>,
-    negativeCommits: Array<Buffer>
-  ): boolean;
-  blindGeneratorBlindSum(values: Array<string>, nInputs: number, blindGenerators: Array<Buffer>, blindFactors: Array<Buffer>): Buffer;
+  commitment(
+    value: string,
+    generator: Uint8Array,
+    blinder: Uint8Array
+  ): Uint8Array;
+  blindGeneratorBlindSum(
+    values: Array<string>,
+    assetBlinders: Array<Uint8Array>,
+    valueBlinders: Array<Uint8Array>,
+    nInputs: number,
+  ): Uint8Array;
 }
 
 interface RangeProof {
-  info(
-    proof: Buffer
-  ): { exp: number; mantissa: string; minValue: string; maxValue: string };
+  info(proof: Uint8Array): {
+    exp: string;
+    mantissa: string;
+    minValue: string;
+    maxValue: string;
+  };
   verify(
-    commit: Buffer,
-    proof: Buffer,
-    generator: Buffer,
-    extraCommit?: Buffer
+    proof: Uint8Array,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
+    extraCommit?: Uint8Array
   ): boolean;
   sign(
-    commit: Buffer,
-    blind: Buffer,
-    nonce: Buffer,
     value: string,
-    generator: Buffer,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
+    valueBlinder: Uint8Array,
+    nonce: Uint8Array,
     minValue?: string,
-    base10Exp?: number,
-    minBits?: number,
-    message?: Buffer,
-    extraCommit?: Buffer
-  ): Buffer;
+    base10Exp?: string,
+    minBits?: string,
+    message?: Uint8Array,
+    extraCommit?: Uint8Array
+  ): Uint8Array;
   rewind(
-    commit: Buffer,
-    proof: Buffer,
-    nonce: Buffer,
-    generator: Buffer,
-    extraCommit?: Buffer
+    proof: Uint8Array,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
+    nonce: Uint8Array,
+    extraCommit?: Uint8Array
   ): {
     value: string;
     minValue: string;
     maxValue: string;
-    blindFactor: Buffer;
-    message: Buffer;
+    blinder: Uint8Array;
+    message: Uint8Array;
   };
 }
 
 interface SurjectionProof {
-  serialize: (proof: {
-    nInputs: number;
-    usedInputs: Buffer;
-    data: Buffer;
-  }) => Buffer;
-  parse: (proof: Buffer) => {
-    nInputs: number;
-    usedInputs: Buffer;
-    data: Buffer;
-  };
   initialize: (
-    inputTags: Array<Buffer>,
-    inputTagsToUse: number,
-    outputTag: Buffer,
+    inputTags: Array<Uint8Array>,
+    outputTag: Uint8Array,
     maxIterations: number,
-    seed: Buffer
+    seed: Uint8Array
   ) => {
-    proof: { nInputs: number; usedInputs: Buffer; data: Buffer };
+    proof: Uint8Array;
     inputIndex: number;
   };
   generate: (
-    proof: { nInputs: number; usedInputs: Buffer; data: Buffer },
-    inputTags: Array<Buffer>,
-    outputTag: Buffer,
+    proof: Uint8Array,
+    inputTags: Array<Uint8Array>,
+    outputTag: Uint8Array,
     inputIndex: number,
-    inputBlindingKey: Buffer,
-    outputBlindingKey: Buffer
-  ) => { nInputs: number; usedInputs: Buffer; data: Buffer };
+    inputBlindingKey: Uint8Array,
+    outputBlindingKey: Uint8Array
+  ) => Uint8Array;
   verify: (
-    proof: { nInputs: number; usedInputs: Buffer; data: Buffer },
-    inputTags: Array<Buffer>,
-    outputTag: Buffer
+    proof: Uint8Array,
+    inputTags: Array<Uint8Array>,
+    outputTag: Uint8Array
   ) => boolean;
 }
 
@@ -107,7 +99,14 @@ interface ZKP {
   generator: Generator 
 }
 
-declare function secp256k1(): Promise<{ ecdh: Ecdh, ec: Ec, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
+declare function secp256k1(): Promise<{
+  ecdh: Ecdh,
+  ec: Ec,
+  generator: Generator
+  pedersen: Pedersen,
+  rangeproof: RangeProof,
+  surjectionproof: SurjectionProof,
+}>;
 
 export {
   ZKP,
