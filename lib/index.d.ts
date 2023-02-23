@@ -60,7 +60,7 @@ interface RangeProof {
     value: string;
     minValue: string;
     maxValue: string;
-    blindFactor: Uint8Array;
+    blinder: Uint8Array;
     message: Uint8Array;
   };
 }
