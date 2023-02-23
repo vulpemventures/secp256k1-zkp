@@ -8,50 +8,53 @@ interface Ec {
 
 interface Generator {
   generate: (seed: Uint8Array) => Uint8Array;
-  generateBlinded(key: Uint8Array, blind: Uint8Array): Uint8Array;
-  parse(input: Uint8Array): Uint8Array;
-  serialize(generator: Uint8Array): Uint8Array;
+  generateBlinded(key: Uint8Array, blinder: Uint8Array): Uint8Array;
 }
 
 interface Pedersen {
-  commit(blindFactor: Uint8Array, value: string, generator: Uint8Array): Uint8Array;
-  commitSerialize(commitment: Uint8Array): Uint8Array;
-  commitParse(input: Uint8Array): Uint8Array;
-  blindSum(blinds: Array<Uint8Array>, nneg?: number): Uint8Array;
-  verifySum(
-    commits: Array<Uint8Array>,
-    negativeCommits: Array<Uint8Array>
-  ): boolean;
-  blindGeneratorBlindSum(values: Array<string>, nInputs: number, blindGenerators: Array<Uint8Array>, blindFactors: Array<Uint8Array>): Uint8Array;
+  commitment(
+    value: string,
+    generator: Uint8Array,
+    blinder: Uint8Array
+  ): Uint8Array;
+  blindGeneratorBlindSum(
+    values: Array<string>,
+    assetBlinders: Array<Uint8Array>,
+    valueBlinders: Array<Uint8Array>,
+    nInputs: number,
+  ): Uint8Array;
 }
 
 interface RangeProof {
-  info(
-    proof: Uint8Array
-  ): { exp: number; mantissa: string; minValue: string; maxValue: string };
+  info(proof: Uint8Array): {
+    exp: string;
+    mantissa: string;
+    minValue: string;
+    maxValue: string;
+  };
   verify(
-    commit: Uint8Array,
     proof: Uint8Array,
-    generator: Uint8Array,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
     extraCommit?: Uint8Array
   ): boolean;
   sign(
-    commit: Uint8Array,
-    blind: Uint8Array,
-    nonce: Uint8Array,
     value: string,
-    generator: Uint8Array,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
+    valueBlinder: Uint8Array,
+    nonce: Uint8Array,
     minValue?: string,
-    base10Exp?: number,
-    minBits?: number,
+    base10Exp?: string,
+    minBits?: string,
     message?: Uint8Array,
     extraCommit?: Uint8Array
   ): Uint8Array;
   rewind(
-    commit: Uint8Array,
     proof: Uint8Array,
+    valueCommitment: Uint8Array,
+    assetCommitment: Uint8Array,
     nonce: Uint8Array,
-    generator: Uint8Array,
     extraCommit?: Uint8Array
   ): {
     value: string;
@@ -63,36 +66,25 @@ interface RangeProof {
 }
 
 interface SurjectionProof {
-  serialize: (proof: {
-    nInputs: number;
-    usedInputs: Uint8Array;
-    data: Uint8Array;
-  }) => Uint8Array;
-  parse: (proof: Uint8Array) => {
-    nInputs: number;
-    usedInputs: Uint8Array;
-    data: Uint8Array;
-  };
   initialize: (
     inputTags: Array<Uint8Array>,
-    inputTagsToUse: number,
     outputTag: Uint8Array,
     maxIterations: number,
     seed: Uint8Array
   ) => {
-    proof: { nInputs: number; usedInputs: Uint8Array; data: Uint8Array };
+    proof: Uint8Array;
     inputIndex: number;
   };
   generate: (
-    proof: { nInputs: number; usedInputs: Uint8Array; data: Uint8Array },
+    proof: Uint8Array,
     inputTags: Array<Uint8Array>,
     outputTag: Uint8Array,
     inputIndex: number,
     inputBlindingKey: Uint8Array,
     outputBlindingKey: Uint8Array
-  ) => { nInputs: number; usedInputs: Uint8Array; data: Uint8Array };
+  ) => Uint8Array;
   verify: (
-    proof: { nInputs: number; usedInputs: Uint8Array; data: Uint8Array },
+    proof: Uint8Array,
     inputTags: Array<Uint8Array>,
     outputTag: Uint8Array
   ) => boolean;
@@ -107,7 +99,14 @@ interface ZKP {
   generator: Generator 
 }
 
-declare function secp256k1(): Promise<{ ecdh: Ecdh, ec: Ec, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
+declare function secp256k1(): Promise<{
+  ecdh: Ecdh,
+  ec: Ec,
+  generator: Generator
+  pedersen: Pedersen,
+  rangeproof: RangeProof,
+  surjectionproof: SurjectionProof,
+}>;
 
 export {
   ZKP,
