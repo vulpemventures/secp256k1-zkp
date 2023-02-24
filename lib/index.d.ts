@@ -1,9 +1,18 @@
 type Ecdh = (pubkey: Buffer, scalar: Buffer) => Buffer;
 
-interface Ec {
-  prvkeyNegate: (key: Buffer) => Buffer;
-  prvkeyTweakAdd: (key: Buffer, tweak: Buffer) => Buffer;
-  prvkeyTweakMul: (key: Buffer, tweak: Buffer) => Buffer;
+interface Ecc {
+  privateNegate: (key: Uint8Array) => Uint8Array;
+  privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  privateMul: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  isPoint: (point: Uint8Array) => boolean;
+  isPrivate: (privatePoint: Uint8Array) => boolean;
+  pointFromScalar: (scalar: Uint8Array, compressed?: boolean) => Uint8Array;
+  pointCompress: (point: Uint8Array, compressed?: boolean) => Uint8Array;
+  xOnlyPointAddTweak: (point: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  sign: (message: Uint8Array, privateKey: Uint8Array, extraEntropy: Uint8Array) => Uint8Array;
+  verify: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array, strict?: boolean) => boolean;
+  signSchnorr: (message: Uint8Array, privateKey: Uint8Array) => Uint8Array;
+  verifySchnorr: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array) => boolean;
 }
 
 interface Generator {
@@ -100,18 +109,18 @@ interface SurjectionProof {
 
 interface ZKP { 
   ecdh: Ecdh, 
-  ec: Ec, 
+  ecc: Ecc, 
   surjectionproof: SurjectionProof, 
   rangeproof: RangeProof, 
   pedersen: Pedersen, 
   generator: Generator 
 }
 
-declare function secp256k1(): Promise<{ isPoint: any, ecdh: Ecdh, ec: Ec, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
+declare function secp256k1(): Promise<{ isPoint: any, ecdh: Ecdh, ec: Ecc, surjectionproof: SurjectionProof, rangeproof: RangeProof, pedersen: Pedersen, generator: Generator }>;
 
 export {
   ZKP,
-  Ec,
+  Ecc,
   Ecdh,
   SurjectionProof,
   RangeProof,

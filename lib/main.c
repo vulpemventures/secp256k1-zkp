@@ -300,7 +300,7 @@ int ec_seckey_tweak_mul(unsigned char *key, const unsigned char *tweak) {
   return ret;
 }
 
-int is_valid_xonly_pubkey(const unsigned char *key) {
+int ec_is_valid_xonly_pubkey(const unsigned char *key) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_xonly_pubkey pubkey;
   int ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey, key); 
@@ -308,7 +308,7 @@ int is_valid_xonly_pubkey(const unsigned char *key) {
   return ret;
 }
 
-int is_valid_ec_pubkey(const unsigned char *key, size_t key_len) {
+int ec_is_valid_ec_pubkey(const unsigned char *key, size_t key_len) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pubkey pubkey;
   int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, key, key_len);
@@ -316,7 +316,7 @@ int is_valid_ec_pubkey(const unsigned char *key, size_t key_len) {
   return ret;
 }
 
-int point_compress(unsigned char *output, size_t output_len, const unsigned char *point, size_t point_len) {
+int ec_point_compress(unsigned char *output, size_t output_len, const unsigned char *point, size_t point_len) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pubkey pubkey;
   int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, point, point_len);
@@ -327,7 +327,7 @@ int point_compress(unsigned char *output, size_t output_len, const unsigned char
   return ret;
 }
 
-int point_from_scalar(unsigned char *output, size_t output_len, const unsigned char *scalar) {
+int ec_point_from_scalar(unsigned char *output, size_t output_len, const unsigned char *scalar) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pubkey pubkey;
   int ret = secp256k1_ec_pubkey_create(ctx, &pubkey, scalar);
@@ -338,7 +338,7 @@ int point_from_scalar(unsigned char *output, size_t output_len, const unsigned c
   return ret;
 }
 
-int x_only_point_add_tweak(unsigned char *output, const unsigned char *point, const unsigned char *tweak) {
+int ec_x_only_point_add_tweak(unsigned char *output, const unsigned char *point, const unsigned char *tweak) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_xonly_pubkey pubkey;
   secp256k1_pubkey pubkey_result;
@@ -362,15 +362,16 @@ int x_only_point_add_tweak(unsigned char *output, const unsigned char *point, co
   return ret;
 }
 
-int ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e) {
+int ec_ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
   secp256k1_ecdsa_signature sig;
-  const void *data = NULL;
+  int ret = 0;
   if (withextradata) {
-    data = e;
+    ret = secp256k1_ecdsa_sign(ctx, &sig, h, d, secp256k1_nonce_function_rfc6979, e);
+  } else {
+    ret = secp256k1_ecdsa_sign(ctx, &sig, h, d, secp256k1_nonce_function_rfc6979, NULL);
   }
 
-  int ret = secp256k1_ecdsa_sign(ctx, &sig, h, d, secp256k1_nonce_function_rfc6979, data);
   if (ret == 1) {
     ret = secp256k1_ecdsa_signature_serialize_compact(ctx, output, &sig);
   }
@@ -378,7 +379,7 @@ int ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned cha
   return ret;
 }
 
-int ecdsa_verify(const unsigned char *q, size_t q_len, const unsigned char *h, const unsigned char *sig, int strict) {
+int ec_ecdsa_verify(const unsigned char *q, size_t q_len, const unsigned char *h, const unsigned char *sig, int strict) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
   secp256k1_ecdsa_signature sig_parsed;
   secp256k1_pubkey pubkey;
@@ -387,51 +388,44 @@ int ecdsa_verify(const unsigned char *q, size_t q_len, const unsigned char *h, c
     ret = secp256k1_ecdsa_signature_parse_compact(ctx, &sig_parsed, sig);
     if (ret == 1) {
       if (strict == 0) {
-        secp256k1_ecdsa_signature_normalize(ctx, &sig_parsed, &sig_parsed);
+        ret = secp256k1_ecdsa_signature_normalize(ctx, &sig_parsed, &sig_parsed);
       }
       ret = secp256k1_ecdsa_verify(ctx, &sig_parsed, h, &pubkey);
-    } else {
-      ret = -1;
-    }
-  } else {
-    // throw error
-    ret = -1;
+    } 
   }
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int sign_schnorr(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e) {
+int ec_sign_schnorr(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
-  secp256k1_keypair key;
-  const void *data = NULL;
-  if (withextradata) {
-    data = e;
-  }
-
+  secp256k1_keypair key; 
   int ret = secp256k1_keypair_create(ctx, &key, d);
-  if (ret == 0) {
-    secp256k1_context_destroy(ctx);
-    return 0;
+  if (ret == 1) {
+    if (withextradata) {
+      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, e);
+    } else {
+      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, NULL);
+    }
   }
-
-  ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, data);
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int verify_schnorr(const unsigned char *q, const unsigned char *h,  size_t h_len, const unsigned char *sig) {
+int ec_verify_schnorr(const unsigned char *q, const unsigned char *h, size_t h_len, const unsigned char *sig) {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
   secp256k1_xonly_pubkey pubkey;
   int ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey, q);
   if (ret == 1) {
     ret = secp256k1_schnorrsig_verify(ctx, sig, h, h_len, &pubkey);
-    if (ret == 1) {
-      ret = 1;
-    } else {
-      ret = 0;
-    }
   }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_seckey_verify(const unsigned char *seckey) {
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+  int ret = secp256k1_ec_seckey_verify(ctx, seckey);
   secp256k1_context_destroy(ctx);
   return ret;
 }
