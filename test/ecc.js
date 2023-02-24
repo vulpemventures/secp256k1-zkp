@@ -38,30 +38,24 @@ describe('ecc', () => {
 
   it('privateNegate', () => {
     fixtures.privateNegate.forEach((f) => {
-      const key = Buffer.from(f.key, 'hex');
-      assert.deepStrictEqual(privateNegate(key).toString('hex'), f.expected);
+      const key = fromHex(f.key);
+      assert.deepStrictEqual(toHex(privateNegate(key)), f.expected);
     });
   });
 
   it('privateAdd', () => {
     fixtures.privateAdd.forEach((f) => {
-      const key = Buffer.from(f.key, 'hex');
-      const tweak = Buffer.from(f.tweak, 'hex');
-      assert.deepStrictEqual(
-        privateAdd(key, tweak).toString('hex'),
-        f.expected
-      );
+      const key = fromHex(f.key);
+      const tweak = fromHex(f.tweak);
+      assert.deepStrictEqual(toHex(privateAdd(key, tweak)), f.expected);
     });
   });
 
   it('privateMul', () => {
     fixtures.privateMul.forEach((f) => {
-      const key = Buffer.from(f.key, 'hex');
-      const tweak = Buffer.from(f.tweak, 'hex');
-      assert.deepStrictEqual(
-        privateMul(key, tweak).toString('hex'),
-        f.expected
-      );
+      const key = fromHex(f.key);
+      const tweak = fromHex(f.tweak);
+      assert.deepStrictEqual(toHex(privateMul(key, tweak)), f.expected);
     });
   });
 
@@ -81,24 +75,20 @@ describe('ecc', () => {
 
   it('pointFromScalar', () => {
     for (const f of fixtures.pointFromScalar) {
-      const d = Buffer.from(f.d, 'hex');
-      const expected = Buffer.from(f.expected, 'hex');
+      const d = fromHex(f.d);
+      const expected = fromHex(f.expected);
       let description = `${f.d} * G = ${f.expected}`;
       if (f.description) description += ` (${f.description})`;
-      assert.strictEqual(
-        Buffer.from(pointFromScalar(d)).toString('hex'),
-        f.expected,
-        description
-      );
+      assert.strictEqual(toHex(pointFromScalar(d)), f.expected, description);
       if (f.expected === null) return;
       assert.strictEqual(
-        Buffer.from(pointFromScalar(d, true)).toString('hex'),
-        Buffer.from(pointCompress(expected, true)).toString('hex'),
+        toHex(pointFromScalar(d, true)),
+        toHex(pointCompress(expected, true)),
         description
       );
       assert.strictEqual(
-        Buffer.from(pointFromScalar(d, false)).toString('hex'),
-        Buffer.from(pointCompress(expected, false)).toString('hex'),
+        toHex(pointFromScalar(d, false)),
+        toHex(pointCompress(expected, false)),
         description
       );
     }
@@ -108,15 +98,9 @@ describe('ecc', () => {
     for (const f of fixtures.pointCompress) {
       const p = Buffer.from(f.P, 'hex');
       if (f.noarg) {
-        assert.strictEqual(
-          Buffer.from(pointCompress(p)).toString('hex'),
-          f.expected
-        );
+        assert.strictEqual(toHex(pointCompress(p)), f.expected);
       } else {
-        assert.strictEqual(
-          Buffer.from(pointCompress(p, f.compress)).toString('hex'),
-          f.expected
-        );
+        assert.strictEqual(toHex(pointCompress(p, f.compress)), f.expected);
       }
     }
   });
@@ -139,10 +123,10 @@ describe('ecc', () => {
     );
 
     for (const f of fixtures.ecdsa.withoutExtraEntropy) {
-      const d = Buffer.from(f.d, 'hex');
-      const m = Buffer.from(f.m, 'hex');
+      const d = fromHex(f.d, 'hex');
+      const m = fromHex(f.m, 'hex');
       assert.deepStrictEqual(
-        Buffer.from(sign(m, d)).toString('hex'),
+        toHex(sign(m, d)),
         f.signature,
         `sign(${f.m}, ...) == ${f.signature}`
       );
@@ -166,33 +150,33 @@ describe('ecc', () => {
       const extraEntropyMax = sign(m, d, buf5);
 
       assert.strictEqual(
-        Buffer.from(extraEntropyUndefined).toString('hex'),
-        Buffer.from(expectedSig).toString('hex'),
+        toHex(extraEntropyUndefined),
+        toHex(expectedSig),
         `sign(${f.m}, ..., undefined) == ${f.signature}`
       );
       assert.strictEqual(
-        Buffer.from(extraEntropy0).toString('hex'),
-        Buffer.from(expectedExtraEntropy0).toString('hex'),
+        toHex(extraEntropy0),
+        toHex(expectedExtraEntropy0),
         `sign(${f.m}, ..., 0) == ${f.signature}`
       );
       assert.strictEqual(
-        Buffer.from(extraEntropy1).toString('hex'),
-        Buffer.from(expectedExtraEntropy1).toString('hex'),
+        toHex(extraEntropy1),
+        toHex(expectedExtraEntropy1),
         `sign(${f.m}, ..., 1) == ${f.signature}`
       );
       assert.strictEqual(
-        Buffer.from(extraEntropyRand).toString('hex'),
-        Buffer.from(expectedExtraEntropyRand).toString('hex'),
+        toHex(extraEntropyRand),
+        toHex(expectedExtraEntropyRand),
         `sign(${f.m}, ..., rand) == ${f.signature}`
       );
       assert.strictEqual(
-        Buffer.from(extraEntropyN).toString('hex'),
-        Buffer.from(expectedExtraEntropyN).toString('hex'),
+        toHex(extraEntropyN),
+        toHex(expectedExtraEntropyN),
         `sign(${f.m}, ..., n) == ${f.signature}`
       );
       assert.strictEqual(
-        Buffer.from(extraEntropyMax).toString('hex'),
-        Buffer.from(expectedExtraEntropyMax).toString('hex'),
+        toHex(extraEntropyMax),
+        toHex(expectedExtraEntropyMax),
         `sign(${f.m}, ..., max256) == ${f.signature}`
       );
     }
