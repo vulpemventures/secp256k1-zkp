@@ -61,47 +61,29 @@ describe('ecc', () => {
 
   it('isPrivate', () => {
     for (const f of fixtures.isPrivate) {
-      const point = fromHex(f.d);
-      assert.deepStrictEqual(isPrivate(point), f.expected);
+      const scalar = fromHex(f.scalar);
+      assert.deepStrictEqual(isPrivate(scalar), f.expected);
     }
   });
 
   it('isPoint', () => {
     for (const f of fixtures.isPoint) {
-      const point = fromHex(f.P);
+      const point = fromHex(f.point);
       assert.deepStrictEqual(isPoint(point), f.expected);
     }
   });
 
   it('pointFromScalar', () => {
     for (const f of fixtures.pointFromScalar) {
-      const d = fromHex(f.d);
-      const expected = fromHex(f.expected);
-      let description = `${f.d} * G = ${f.expected}`;
-      if (f.description) description += ` (${f.description})`;
-      assert.strictEqual(toHex(pointFromScalar(d)), f.expected, description);
-      if (f.expected === null) return;
-      assert.strictEqual(
-        toHex(pointFromScalar(d, true)),
-        toHex(pointCompress(expected, true)),
-        description
-      );
-      assert.strictEqual(
-        toHex(pointFromScalar(d, false)),
-        toHex(pointCompress(expected, false)),
-        description
-      );
+      const scalar = fromHex(f.scalar);
+      assert.strictEqual(toHex(pointFromScalar(scalar)), f.expected);
     }
   });
 
   it('pointCompress', () => {
     for (const f of fixtures.pointCompress) {
-      const p = Buffer.from(f.P, 'hex');
-      if (f.noarg) {
-        assert.strictEqual(toHex(pointCompress(p)), f.expected);
-      } else {
-        assert.strictEqual(toHex(pointCompress(p, f.compress)), f.expected);
-      }
+      const point = Buffer.from(f.point, 'hex');
+      assert.strictEqual(toHex(pointCompress(point)), f.expected);
     }
   });
 
@@ -123,18 +105,14 @@ describe('ecc', () => {
     );
 
     for (const f of fixtures.ecdsa.withoutExtraEntropy) {
-      const d = fromHex(f.d, 'hex');
-      const m = fromHex(f.m, 'hex');
-      assert.deepStrictEqual(
-        toHex(sign(m, d)),
-        f.signature,
-        `sign(${f.m}, ...) == ${f.signature}`
-      );
+      const scalar = fromHex(f.scalar);
+      const message = fromHex(f.message);
+      assert.deepStrictEqual(toHex(sign(message, scalar)), f.signature);
     }
 
     for (const f of fixtures.ecdsa.withExtraEntropy) {
-      const d = fromHex(f.d);
-      const m = fromHex(f.m);
+      const scalar = fromHex(f.scalar);
+      const message = fromHex(f.message);
       const expectedSig = fromHex(f.signature);
       const expectedExtraEntropy0 = fromHex(f.extraEntropy0);
       const expectedExtraEntropy1 = fromHex(f.extraEntropy1);
@@ -142,118 +120,87 @@ describe('ecc', () => {
       const expectedExtraEntropyN = fromHex(f.extraEntropyN);
       const expectedExtraEntropyMax = fromHex(f.extraEntropyMax);
 
-      const extraEntropyUndefined = sign(m, d);
-      const extraEntropy0 = sign(m, d, buf1);
-      const extraEntropy1 = sign(m, d, buf2);
-      const extraEntropyRand = sign(m, d, buf3);
-      const extraEntropyN = sign(m, d, buf4);
-      const extraEntropyMax = sign(m, d, buf5);
+      const extraEntropyUndefined = sign(message, scalar);
+      const extraEntropy0 = sign(message, scalar, buf1);
+      const extraEntropy1 = sign(message, scalar, buf2);
+      const extraEntropyRand = sign(message, scalar, buf3);
+      const extraEntropyN = sign(message, scalar, buf4);
+      const extraEntropyMax = sign(message, scalar, buf5);
 
-      assert.strictEqual(
-        toHex(extraEntropyUndefined),
-        toHex(expectedSig),
-        `sign(${f.m}, ..., undefined) == ${f.signature}`
-      );
-      assert.strictEqual(
-        toHex(extraEntropy0),
-        toHex(expectedExtraEntropy0),
-        `sign(${f.m}, ..., 0) == ${f.signature}`
-      );
-      assert.strictEqual(
-        toHex(extraEntropy1),
-        toHex(expectedExtraEntropy1),
-        `sign(${f.m}, ..., 1) == ${f.signature}`
-      );
+      assert.strictEqual(toHex(extraEntropyUndefined), toHex(expectedSig));
+      assert.strictEqual(toHex(extraEntropy0), toHex(expectedExtraEntropy0));
+      assert.strictEqual(toHex(extraEntropy1), toHex(expectedExtraEntropy1));
       assert.strictEqual(
         toHex(extraEntropyRand),
-        toHex(expectedExtraEntropyRand),
-        `sign(${f.m}, ..., rand) == ${f.signature}`
+        toHex(expectedExtraEntropyRand)
       );
-      assert.strictEqual(
-        toHex(extraEntropyN),
-        toHex(expectedExtraEntropyN),
-        `sign(${f.m}, ..., n) == ${f.signature}`
-      );
+      assert.strictEqual(toHex(extraEntropyN), toHex(expectedExtraEntropyN));
       assert.strictEqual(
         toHex(extraEntropyMax),
-        toHex(expectedExtraEntropyMax),
-        `sign(${f.m}, ..., max256) == ${f.signature}`
+        toHex(expectedExtraEntropyMax)
       );
     }
   });
 
   it('verify', () => {
     for (const f of fixtures.ecdsa.withoutExtraEntropy) {
-      const Q = fromHex(f.Q);
-      const Qu = fromHex(f.Qu);
-      const m = fromHex(f.m);
+      const publicKey = fromHex(f.publicKey);
+      const publicKeyUncompressed = fromHex(f.publicKeyUncompressed);
+      const message = fromHex(f.message);
       const signature = fromHex(f.signature);
       const corruptedSignature = fromHex(f.corruptedSignature);
-
+      assert.deepStrictEqual(verify(message, publicKey, signature), true);
       assert.deepStrictEqual(
-        verify(m, Q, signature),
-        true,
-        `verify(${f.signature}) is OK`
+        verify(message, publicKey, corruptedSignature),
+        false
       );
       assert.deepStrictEqual(
-        verify(m, Q, corruptedSignature),
-        false,
-        `verify(${toHex(corruptedSignature)}) is rejected`
+        verify(message, publicKeyUncompressed, signature),
+        true
       );
       assert.deepStrictEqual(
-        verify(m, Qu, signature),
-        true,
-        `verify(${f.signature}) is OK`
-      );
-      assert.deepStrictEqual(
-        verify(m, Qu, corruptedSignature),
-        false,
-        `verify(${toHex(corruptedSignature)}) is rejected`
+        verify(message, publicKeyUncompressed, corruptedSignature),
+        false
       );
     }
   });
 
   it('signSchnorr', () => {
     for (const {
-      m,
-      d,
-      e,
-      s,
-      comment,
+      message,
+      scalar,
+      extraEntropy,
+      signature,
       exception,
-    } of fixtures.bip340testvectors) {
-      if (!d) continue; // skip test vectors without private key (only Q for verify case)
+    } of fixtures.schnorr) {
+      if (!scalar) continue;
       if (exception) {
-        assert.throws(
-          () => signSchnorr(fromHex(m), fromHex(d), fromHex(e)),
-          new RegExp(exception),
-          comment || `signSchnorr(${m}, ${d}, ${e}) throws ${exception}`
+        assert.throws(() =>
+          signSchnorr(fromHex(message), fromHex(scalar), fromHex(extraEntropy))
         );
         continue;
       }
       assert.deepStrictEqual(
-        toHex(signSchnorr(fromHex(m), fromHex(d), fromHex(e))),
-        s,
-        comment || `signSchnorr(${m}, ${d}, ${e}) == ${s}`
+        toHex(
+          signSchnorr(fromHex(message), fromHex(scalar), fromHex(extraEntropy))
+        ),
+        signature
       );
     }
   });
 
   it('verifySchnorr', () => {
     for (const {
-      m,
-      Q,
-      e,
-      s,
-      v,
-      comment,
+      message,
+      publicKey,
+      signature,
       exception,
-    } of fixtures.bip340testvectors) {
+      valid,
+    } of fixtures.schnorr) {
       if (exception) continue; // do not verify invalid BIP340 test vectors
       assert.deepStrictEqual(
-        verifySchnorr(fromHex(m), fromHex(Q), fromHex(s)),
-        v,
-        comment || `verifySchnorr(${m}, ${Q}, ${e}, ${s}) == ${v}`
+        verifySchnorr(fromHex(message), fromHex(publicKey), fromHex(signature)),
+        valid
       );
     }
   });
