@@ -7,6 +7,8 @@
 #include "secp256k1_rangeproof.h"
 #include "secp256k1_preallocated.h"
 #include "secp256k1_surjectionproof.h"
+#include "secp256k1_extrakeys.h"
+#include "secp256k1_schnorrsig.h"
 
 #ifndef SECP256K1_CONTEXT_ALL
 #define SECP256K1_CONTEXT_ALL SECP256K1_CONTEXT_NONE | SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY
@@ -49,13 +51,13 @@ int generator_generate_blinded(unsigned char *output, const unsigned char *key, 
     secp256k1_context_destroy(ctx);
     return ret;
   }
-  
-  ret = secp256k1_generator_serialize(ctx, output, &gen);;
+
+  ret = secp256k1_generator_serialize(ctx, output, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int pedersen_blind_generator_blind_sum(const uint64_t *values, const unsigned char* const *generator_blinds, unsigned char **blind_factors, size_t n_total, size_t n_inputs, unsigned char * bytes_out)
+int pedersen_blind_generator_blind_sum(const uint64_t *values, const unsigned char *const *generator_blinds, unsigned char **blind_factors, size_t n_total, size_t n_inputs, unsigned char *bytes_out)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   blind_factors[n_total - 1] = bytes_out;
@@ -70,14 +72,16 @@ int pedersen_commitment(unsigned char *output, uint64_t value, const unsigned ch
   secp256k1_generator gen;
 
   int ret = secp256k1_generator_parse(ctx, &gen, generator);
-  if (!ret) {
+  if (!ret)
+  {
     secp256k1_context_destroy(ctx);
     return ret;
   }
 
   secp256k1_pedersen_commitment commit;
   ret = secp256k1_pedersen_commit(ctx, &commit, blinder, value, &gen);
-  if (!ret) {
+  if (!ret)
+  {
     secp256k1_context_destroy(ctx);
     return ret;
   }
@@ -132,6 +136,7 @@ int rangeproof_verify(uint64_t *min_value, uint64_t *max_value, const unsigned c
 
   secp256k1_generator gen;
   ret = secp256k1_generator_parse(ctx, &gen, generator_data);
+  if (!ret)
   {
     secp256k1_context_destroy(ctx);
     return ret;
@@ -166,10 +171,12 @@ int rangeproof_rewind(unsigned char *blind_out, uint64_t *value_out, uint64_t *m
   return ret;
 }
 
-int surjectionproof_initialize(unsigned char *output, size_t *outputlen, size_t *input_index, const unsigned char * const *input_tags_data, const size_t n_input_tags, const size_t n_input_tags_to_use, const unsigned char *output_tag_data, const size_t n_max_iterations, const unsigned char *random_seed32) {
+int surjectionproof_initialize(unsigned char *output, size_t *outputlen, size_t *input_index, const unsigned char *const *input_tags_data, const size_t n_input_tags, const size_t n_input_tags_to_use, const unsigned char *output_tag_data, const size_t n_max_iterations, const unsigned char *random_seed32)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_fixed_asset_tag input_tags[n_input_tags];
-  for (int i = 0; i < (int)n_input_tags; ++i) {
+  for (int i = 0; i < (int)n_input_tags; ++i)
+  {
     memcpy(&(input_tags[i].data), input_tags_data[i], 32);
   }
 
@@ -189,7 +196,8 @@ int surjectionproof_initialize(unsigned char *output, size_t *outputlen, size_t 
   return ret;
 }
 
-int surjectionproof_generate(unsigned char *output, size_t *outputlen, const unsigned char *proof_data, const size_t proof_len, const unsigned char * const *ephemeral_input_tags_data, const size_t n_ephemeral_input_tags, const unsigned char *ephemeral_output_tag_data, size_t input_index, const unsigned char *input_blinding_key, const unsigned char *output_blinding_key) {
+int surjectionproof_generate(unsigned char *output, size_t *outputlen, const unsigned char *proof_data, const size_t proof_len, const unsigned char *const *ephemeral_input_tags_data, const size_t n_ephemeral_input_tags, const unsigned char *ephemeral_output_tag_data, size_t input_index, const unsigned char *input_blinding_key, const unsigned char *output_blinding_key)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_surjectionproof proof;
   int ret = secp256k1_surjectionproof_parse(ctx, &proof, proof_data, proof_len);
@@ -200,7 +208,8 @@ int surjectionproof_generate(unsigned char *output, size_t *outputlen, const uns
   }
 
   secp256k1_generator ephemeral_input_tags[n_ephemeral_input_tags];
-  for (int i = 0; i < (int)n_ephemeral_input_tags; ++i) {
+  for (int i = 0; i < (int)n_ephemeral_input_tags; ++i)
+  {
     int ret = secp256k1_generator_parse(ctx, &ephemeral_input_tags[i], ephemeral_input_tags_data[i]);
     if (!ret)
     {
@@ -217,7 +226,8 @@ int surjectionproof_generate(unsigned char *output, size_t *outputlen, const uns
   }
 
   ret = secp256k1_surjectionproof_generate(ctx, &proof, ephemeral_input_tags, n_ephemeral_input_tags, &ephemeral_output_tag, input_index, input_blinding_key, output_blinding_key);
-  if (!ret) {
+  if (!ret)
+  {
     secp256k1_context_destroy(ctx);
     return ret;
   }
@@ -227,18 +237,20 @@ int surjectionproof_generate(unsigned char *output, size_t *outputlen, const uns
   return ret;
 }
 
-int surjectionproof_verify(const unsigned char *proof_data, const size_t proof_len, const unsigned char * const *ephemeral_input_tags_data, const size_t n_ephemeral_input_tags, const unsigned char *ephemeral_output_tag_data) {
+int surjectionproof_verify(const unsigned char *proof_data, const size_t proof_len, const unsigned char *const *ephemeral_input_tags_data, const size_t n_ephemeral_input_tags, const unsigned char *ephemeral_output_tag_data)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
   secp256k1_surjectionproof proof;
   int ret = secp256k1_surjectionproof_parse(ctx, &proof, proof_data, proof_len);
   if (!ret)
   {
     secp256k1_context_destroy(ctx);
-    return ret;  
+    return ret;
   }
 
   secp256k1_generator ephemeral_input_tags[n_ephemeral_input_tags];
-  for (int i = 0; i < (int)n_ephemeral_input_tags; ++i) {
+  for (int i = 0; i < (int)n_ephemeral_input_tags; ++i)
+  {
     int ret = secp256k1_generator_parse(ctx, &ephemeral_input_tags[i], ephemeral_input_tags_data[i]);
     if (!ret)
     {
@@ -259,23 +271,177 @@ int surjectionproof_verify(const unsigned char *proof_data, const size_t proof_l
   return ret;
 }
 
-int ec_seckey_negate(unsigned char *key) {
+int ec_seckey_negate(unsigned char *key)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   int ret = secp256k1_ec_seckey_negate(ctx, key);
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int ec_seckey_tweak_add(unsigned char *key, const unsigned char *tweak) {
+int ec_seckey_tweak_add(unsigned char *key, const unsigned char *tweak)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   int ret = secp256k1_ec_seckey_tweak_add(ctx, key, tweak);
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int ec_seckey_tweak_mul(unsigned char *key, const unsigned char *tweak) {
+int ec_seckey_tweak_mul(unsigned char *key, const unsigned char *tweak)
+{
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   int ret = secp256k1_ec_seckey_tweak_mul(ctx, key, tweak);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_is_valid_xonly_pubkey(const unsigned char *key)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_xonly_pubkey pubkey;
+  int ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey, key);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_is_valid_pubkey(const unsigned char *key, size_t key_len)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_pubkey pubkey;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, key, key_len);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_is_point(const unsigned char *key, size_t key_len)
+{
+  if (key_len == 32) {
+    return ec_is_valid_xonly_pubkey(key);
+  }
+
+  return ec_is_valid_pubkey(key, key_len);
+}
+
+int ec_point_compress(unsigned char *output, size_t *output_len, const unsigned char *point, size_t point_len)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_pubkey pubkey;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, point, point_len);
+  if (ret == 1)
+  {
+    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, SECP256K1_EC_COMPRESSED);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_point_from_scalar(unsigned char *output, size_t *output_len, const unsigned char *scalar)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_pubkey pubkey;
+  int ret = secp256k1_ec_pubkey_create(ctx, &pubkey, scalar);
+  if (ret == 1)
+  {
+    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, SECP256K1_EC_COMPRESSED);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_x_only_point_add_tweak(unsigned char *output, int* parity, const unsigned char *point, const unsigned char *tweak)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_xonly_pubkey pubkey;
+  secp256k1_pubkey pubkey_result;
+  int ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey, point);
+  if (ret == 1)
+  {
+    ret = secp256k1_xonly_pubkey_tweak_add(ctx, &pubkey_result, &pubkey, tweak);
+    if (ret == 1)
+    {
+      ret = secp256k1_xonly_pubkey_from_pubkey(ctx, &pubkey, parity, &pubkey_result);
+      if (ret == 1)
+      {
+        ret = secp256k1_xonly_pubkey_serialize(ctx, output, &pubkey);
+      }
+    }
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+  secp256k1_ecdsa_signature sig;
+  int ret = secp256k1_ecdsa_sign(ctx, &sig, h, d, secp256k1_nonce_function_rfc6979, withextradata ? e : NULL);
+  if (ret == 1)
+  {
+    ret = secp256k1_ecdsa_signature_serialize_compact(ctx, output, &sig);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_ecdsa_verify(const unsigned char *q, size_t q_len, const unsigned char *h, const unsigned char *sig, const int strict)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+  secp256k1_ecdsa_signature sig_parsed;
+  secp256k1_pubkey pubkey;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, q, q_len);
+  if (ret == 1)
+  {
+    ret = secp256k1_ecdsa_signature_parse_compact(ctx, &sig_parsed, sig);
+    if (ret == 1)
+    {
+      if (strict == 0)
+      {
+        ret = secp256k1_ecdsa_signature_normalize(ctx, &sig_parsed, &sig_parsed);
+      }
+      ret = secp256k1_ecdsa_verify(ctx, &sig_parsed, h, &pubkey);
+    }
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_sign_schnorr(unsigned char *output, const unsigned char *d, const unsigned char *h, const int withextradata, const unsigned char *e)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+  secp256k1_keypair key;
+  int ret = secp256k1_keypair_create(ctx, &key, d);
+  if (ret == 1)
+  {
+    if (withextradata)
+    {
+      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, e);
+    }
+    else
+    {
+      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, NULL);
+    }
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_verify_schnorr(const unsigned char *q, const unsigned char *h, size_t h_len, const unsigned char *sig)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+  secp256k1_xonly_pubkey pubkey;
+  int ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey, q);
+  if (ret == 1)
+  {
+    ret = secp256k1_schnorrsig_verify(ctx, sig, h, h_len, &pubkey);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int ec_seckey_verify(const unsigned char *seckey)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+  int ret = secp256k1_ec_seckey_verify(ctx, seckey);
   secp256k1_context_destroy(ctx);
   return ret;
 }
