@@ -370,7 +370,7 @@ int ec_x_only_point_add_tweak(unsigned char *output, int* parity, const unsigned
   return ret;
 }
 
-int ec_ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e)
+int ec_sign_ecdsa(unsigned char *output, const unsigned char *d, const unsigned char *h, int withextradata, const unsigned char *e)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
   secp256k1_ecdsa_signature sig;
@@ -383,7 +383,7 @@ int ec_ecdsa_sign(unsigned char *output, const unsigned char *d, const unsigned 
   return ret;
 }
 
-int ec_ecdsa_verify(const unsigned char *q, size_t q_len, const unsigned char *h, const unsigned char *sig, const int strict)
+int ec_verify_ecdsa(const unsigned char *q, size_t q_len, const unsigned char *h, const unsigned char *sig, const int strict)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
   secp256k1_ecdsa_signature sig_parsed;
@@ -412,14 +412,7 @@ int ec_sign_schnorr(unsigned char *output, const unsigned char *d, const unsigne
   int ret = secp256k1_keypair_create(ctx, &key, d);
   if (ret == 1)
   {
-    if (withextradata)
-    {
-      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, e);
-    }
-    else
-    {
-      ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, NULL);
-    }
+    ret = secp256k1_schnorrsig_sign32(ctx, output, h, &key, withextradata ? e : NULL);
   }
   secp256k1_context_destroy(ctx);
   return ret;
