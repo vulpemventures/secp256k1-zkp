@@ -130,9 +130,9 @@ Multiply a private key by a tweak.
 pointCompress :: Buffer -> Bool -> Buffer
 ```
 
-Compress or uncompress a point.
+Compress a point.
 - `point` 33-byte (compressed) or 65-bytes (uncompressed) representation of a point.
-- `compressed` whether to compress or not, if not specified: true.
+- `compressed` unused.
 
 ### pointFromScalar(scalar[, compressed])
 
@@ -142,7 +142,7 @@ pointFromScalar :: Buffer -> Bool -> Buffer
 
 Compute a public key from a secret key.
 - `scalar` 32-byte scalar.
-- `compressed` whether to compress or not, if not specified: true.
+- `compressed` unused.
 
 #### xOnlyPointAddTweak(point, tweak)
 
