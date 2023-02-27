@@ -142,7 +142,7 @@ pointFromScalar :: Buffer -> Bool -> Buffer
 
 Compute a public key from a secret key.
 - `scalar` 32-byte scalar.
-- `compressed` whether to compress or not, if not specified: true.
+- `compressed` unused.
 
 #### xOnlyPointAddTweak(point, tweak)
 
