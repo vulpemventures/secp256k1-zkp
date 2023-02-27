@@ -130,7 +130,7 @@ Multiply a private key by a tweak.
 pointCompress :: Buffer -> Bool -> Buffer
 ```
 
-Compress or uncompress a point.
+Compress a point.
 - `point` 33-byte (compressed) or 65-bytes (uncompressed) representation of a point.
 - `compressed` unused.
 
