@@ -9,9 +9,9 @@ interface Ecc {
   pointFromScalar: (scalar: Uint8Array, compressed?: boolean) => Uint8Array;
   pointCompress: (point: Uint8Array, compressed?: boolean) => Uint8Array;
   xOnlyPointAddTweak: (point: Uint8Array, tweak: Uint8Array) => { parity: 1 | 0, xOnlyPubkey: Uint8Array };
-  sign: (message: Uint8Array, privateKey: Uint8Array, extraEntropy: Uint8Array) => Uint8Array;
+  sign: (message: Uint8Array, privateKey: Uint8Array, extraEntropy?: Uint8Array) => Uint8Array;
   verify: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array, strict?: boolean) => boolean;
-  signSchnorr: (message: Uint8Array, privateKey: Uint8Array) => Uint8Array;
+  signSchnorr: (message: Uint8Array, privateKey: Uint8Array, extraEntropy?: Uint8Array) => Uint8Array;
   verifySchnorr: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array) => boolean;
 }
 
