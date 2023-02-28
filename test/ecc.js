@@ -10,6 +10,7 @@ const toHex = (buf) => Buffer.from(buf).toString('hex');
 describe('ecc', () => {
   let privateNegate,
     privateAdd,
+    privateSub,
     privateMul,
     sign,
     verify,
@@ -24,6 +25,7 @@ describe('ecc', () => {
     ({
       privateNegate,
       privateAdd,
+      privateSub,
       privateMul,
       sign,
       verify,
@@ -48,6 +50,19 @@ describe('ecc', () => {
       const key = fromHex(f.key);
       const tweak = fromHex(f.tweak);
       assert.deepStrictEqual(toHex(privateAdd(key, tweak)), f.expected);
+    });
+  });
+
+  it('privateSub', () => {
+    fixtures.privateSub.valid.forEach((f) => {
+      const key = fromHex(f.key);
+      const tweak = fromHex(f.tweak);
+      assert.deepStrictEqual(toHex(privateSub(key, tweak)), f.expected);
+    });
+    fixtures.privateSub.invalid.forEach((f) => {
+      const key = fromHex(f.key);
+      const tweak = fromHex(f.tweak);
+      assert.throws(() => privateSub(key, tweak));
     });
   });
 
