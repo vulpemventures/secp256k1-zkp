@@ -62,8 +62,6 @@ surjectionproof.verify(...)
 
 ## Documentation
 
-
-
 ### Ecdh
 
 #### ecdh(pubkey, scalar)
@@ -77,106 +75,179 @@ Compute an EC Diffie-Hellman secret in constant time.
 - `pubkey` 33-byte representation of a point.
 - `scalar` 32-byte arrayscalar with which to multiply the point.
 
+### Ecc
+
+#### isPoint(point)
+
+```haskell
+isPoint :: Buffer -> Bool
+```
+
+Whether a point is valid or not.
+- `point` 33-byte (compressed) or 65-bytes (uncompressed) representation of a point.
+
+#### isPrivate(key)
+
+```haskell
+isPrivate :: Buffer -> Bool
+```
+
+Whether a scalar is valid to be used as a private key.
+- `key` 32-byte scalar.
+
+#### privateNegate(key)
+
+```haskell
+privateNegate :: Buffer -> Buffer
+```
+
+Negate a private key.
+- `key` 32-byte scalar.
+
+#### privateAdd(key, tweak)
+
+```haskell
+privateAdd :: Buffer -> Buffer -> Buffer
+```
+
+Add a tweak to a private key.
+- `key` 32-byte scalar.
+- `tweak` 32-byte scalar.
+
+#### privateMul(key, tweak)
+
+```haskell
+privateMul :: Buffer -> Buffer -> Buffer
+```
+
+Multiply a private key by a tweak.
+- `key` 32-byte scalar.
+- `tweak` 32-byte scalar.
+
+#### pointCompress(point[, compressed])
+
+```haskell
+pointCompress :: Buffer -> Bool -> Buffer
+```
+
+Compress a point.
+- `point` 33-byte (compressed) or 65-bytes (uncompressed) representation of a point.
+- `compressed` unused.
+
+### pointFromScalar(scalar[, compressed])
+
+```haskell
+pointFromScalar :: Buffer -> Bool -> Buffer
+```
+
+Compute a public key from a secret key.
+- `scalar` 32-byte scalar.
+- `compressed` unused.
+
+#### xOnlyPointAddTweak(point, tweak)
+
+```haskell
+xOnlyPointAddTweak :: Buffer -> Buffer -> Buffer
+```
+
+Add a tweak to a point.
+- `point` 32-byte x-only point.
+- `tweak` 32-byte scalar.
+
+#### sign(message, privateKey[, extraEntropy])
+
+```haskell
+sign :: Buffer -> Buffer -> Buffer -> Buffer
+```
+
+Sign a message using the private key (ECDSA with RFC6979 nonce generation).
+- `message` message to sign.
+- `privateKey` 32-byte private key.
+- `extraEntropy` 32-byte extra entropy to add to the nonce generation, if not specified: null.
+
+#### verify(message, publicKey, signature, [, strict])
+
+```haskell
+verify :: Buffer -> Buffer -> Buffer -> Bool -> Bool
+```
+
+Verify an ECDSA signature.
+- `message` message to verify.
+- `publicKey` 33-byte (compressed) or 65-bytes (uncompressed) representation of a point.
+- `signature` 64-byte signature.
+- if true valid signatures with any of (r, s) values greater than order / 2 are rejected. if not specified: false.
+
+#### signSchnorr(message, privateKey[, extraEntropy])
+
+```haskell
+signSchnorr :: Buffer -> Buffer -> Buffer -> Buffer
+```
+
+Sign a message using Schnorr following BIP340.
+- `message` 32-byte message to sign.
+- `privateKey` 32-byte private key.
+- `extraEntropy` 32-byte extra entropy to add to the nonce generation, if not specified: '00' * 32.
+
+#### verifySchnorr(message, publicKey, signature)
+
+```haskell
+verifySchnorr :: Buffer -> Buffer -> Buffer -> Bool
+```
+
+Verify a Schnorr signature following BIP340.
+- `message` 32-byte message to verify.
+- `publicKey` 32-byte x-only public key.
+- `signature` 64-byte signature.
+
 ### Generator
 
-#### generateBlinded(key, blind)
+#### generate(seed)
 
-```haskel
+```haskell
+generate :: Buffer -> Buffer
+```
+
+Generate a blinding generator.
+- `seed` 32-byte seed.
+
+#### generateBlinded(key, blinder)
+
+```haskell
 generateBlinded :: Buffer -> Buffer -> Buffer
 ```
 
 Generate a blinded generator for the curve.
 
-- `key` 32-byte seed.
-- `blind` 32-byte secret value to blind the generator with.
+- `key` 32-byte key.
+- `blinder` 32-byte secret value to blind the generator with.
 
-#### parse(input)
-
-```haskell
-parse :: Buffer -> Buffer
-```
-
-Parse a 33-byte generator byte sequence into a 64-byte raw generator.
-
-- `input` 33-byte serialized generator.
-
-#### serialize(generator)
-
-```haskell
-serialize :: Buffer -> Buffer
-```
-
-Serialize a raw generator into a serialized byte sequence.
-
-- `generator` 64-byte raw generator to serialize.
 
 ### Pedersen
 
-#### commit(blindFactor, value)
+#### commitment(value, generator, blinder)
 
 ```haskell
-commit :: Buffer -> String -> Buffer
+commit :: String -> Buffer -> Buffer -> Buffer
 ```
 
 Generate a pedersen commitment.
 
-- `blindFactor` 32-byte blinding factor.
 - `value` uint64 value to commit to as string.
+- `generator` 33-byte generator to commit to.
+- `blinder` 32-byte blinding factor.
 
-#### commitSerialize(commitment)
-
-```haskel
-commitSerialize :: Buffer -> Buffer
-```
-
-Serialize a raw commitment into a 33-byte serialized byte sequence.
-
-- `commitment` raw commitment to serialize.
-
-#### commitParse(input)
+#### blindGeneratorBlindSum(values, assetBlinders, valueBlinders, nInputs)
 
 ```haskell
-commitParse :: Buffer -> Buffer
-```
-
-Parse a 33-byte commitment into a raw commitment.
-
-- `input` 33-byte serialized commitment key
-
-#### blindGeneratorBlindSum(values, nInputs, blindGenerators, blindFactors)
-
-```haskell
-blindGeneratorBlindSum :: Array -> Number -> Array -> Array -> Buffer
+blindGeneratorBlindSum :: Array -> Array -> Array -> Number -> Buffer
 ```
 
 Set the final Pedersen blinding factor correctly when the generators themselves have blinding factors.
 
 - `values` array of string asset values.
+- `assetBlinders` array of asset blinding factors.
+- `valueBlinders` array of value blinding factors.
 - `nInputs` How many of the initial array elements represent commitments that will be negated in the final sum.
-- `blindGenerators` array of asset blinding factors.
-- `blindFactors` array of commitment blinding factors.
-
-#### blindSum(blinds[, nneg=0])
-
-```haskell
-blindSum :: Array [-> Number] -> Buffer
-```
-
-Compute the sum of multiple positive and negative blinding factors.
-
-- `blinds` array of 32-byte blinding factors.
-- `nneg` how many of the initial factors should be treated with a negative sign.
-
-#### verifySum(commits, negativeCommits)
-
-```haskell
-verifySum :: Array -> Array -> Bool
-```
-
-Verify a tally of pedersen commitments.
-
-- `commits` array of 33-byte pedersen commitments
-- `negativeCommits` array of 33-byte pedersen negative commitments
 
 ### Rangeproof
 
@@ -243,20 +314,10 @@ Returns wether the value is within the range [0..2^64), the specifically proven 
 
 ### Surjectionproof
 
-#### serialize(proof)
-
-```haskell
-serialize :: Object -> Buffer
-```
-
-Serialize a surjection proof.
-
-- `proof` initialized surjection proof.
-
 #### initialize(inputTags, inputTagsToUse, outputTag, maxIterations, seed)
 
 ```haskell
-initialize :: Array -> Number -> Buffer -> Number -> Object
+initialize :: Array -> Number -> Buffer -> Number -> Buffer
 ```
 
 Initialize a surjection proof.
@@ -270,7 +331,7 @@ Initialize a surjection proof.
 #### generate(proof, inputTags, outputTag, inputIndex, inputBlindingKey, outputBlindingKey)
 
 ```haskell
-generate :: Object -> Array -> Buffer -> Number -> Buffer -> Buffer -> Object
+generate :: Object -> Array -> Buffer -> Number -> Buffer -> Buffer -> Buffer
 ```
 
 Generate an initialized surjection proof.
