@@ -336,33 +336,33 @@ int ec_is_point(const unsigned char *key, size_t key_len)
   return ec_is_valid_pubkey(key, key_len);
 }
 
-int ec_point_compress(unsigned char *output, size_t *output_len, const unsigned char *point, size_t point_len)
+int ec_point_compress(unsigned char *output, size_t *output_len, const unsigned char *point, size_t point_len, int compress)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pubkey pubkey;
   int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, point, point_len);
   if (ret == 1)
   {
-    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, SECP256K1_EC_COMPRESSED);
+    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
   }
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int ec_point_from_scalar(unsigned char *output, size_t *output_len, const unsigned char *scalar)
+int ec_point_from_scalar(unsigned char *output, size_t *output_len, const unsigned char *scalar, int compress)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pubkey pubkey;
   int ret = secp256k1_ec_pubkey_create(ctx, &pubkey, scalar);
   if (ret == 1)
   {
-    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, SECP256K1_EC_COMPRESSED);
+    ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
   }
   secp256k1_context_destroy(ctx);
   return ret;
 }
 
-int ec_x_only_point_add_tweak(unsigned char *output, int* parity, const unsigned char *point, const unsigned char *tweak)
+int ec_x_only_point_tweak_add(unsigned char *output, int *parity, const unsigned char *point, const unsigned char *tweak)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_xonly_pubkey pubkey;
