@@ -362,7 +362,7 @@ int ec_point_from_scalar(unsigned char *output, size_t *output_len, const unsign
   return ret;
 }
 
-int ec_x_only_point_add_tweak(unsigned char *output, int* parity, const unsigned char *point, const unsigned char *tweak)
+int ec_x_only_point_tweak_add(unsigned char *output, int *parity, const unsigned char *point, const unsigned char *tweak)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_xonly_pubkey pubkey;

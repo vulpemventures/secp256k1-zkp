@@ -19,7 +19,8 @@ describe('ecc', () => {
     isPrivate,
     isPoint,
     pointFromScalar,
-    pointCompress;
+    pointCompress,
+    xOnlyPointAddTweak;
 
   before(async () => {
     ({
@@ -35,6 +36,7 @@ describe('ecc', () => {
       isPoint,
       pointFromScalar,
       pointCompress,
+      xOnlyPointAddTweak,
     } = (await secp256k1()).ecc);
   });
 
@@ -100,6 +102,17 @@ describe('ecc', () => {
       const point = Buffer.from(f.point, 'hex');
       assert.strictEqual(toHex(pointCompress(point)), f.expected);
     }
+  });
+
+  it('xOnlyPointAddTweak', () => {
+    fixtures.xOnlyPointAddTweak.forEach((f) => {
+      const pubkey = fromHex(f.pubkey);
+      const tweak = fromHex(f.tweak);
+
+      const { parity, xOnlyPubkey } = xOnlyPointAddTweak(pubkey, tweak);
+      assert.deepStrictEqual(toHex(xOnlyPubkey), f.expected);
+      assert.deepStrictEqual(parity, f.parity);
+    });
   });
 
   it('sign', () => {
