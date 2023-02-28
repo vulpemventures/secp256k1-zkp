@@ -29,6 +29,60 @@
       "expected": "ac19b061baa6c737f7da38c5c8d1ae9d8edf0cb513e1f333fb0af0e08b24ae72"
     }
   ],
+  "privateSub": {
+    "valid": [
+      {
+        "key": "0000000000000000000000000000000000000000000000000000000000000002",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001",
+        "expected": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "key": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413f",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001",
+        "expected": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413e"
+      },
+      {
+        "key": "83d687ee30a61afca0762833e5bf9f65ffffffffffffffffffffffffffffffff",
+        "tweak": "0000000000000000000000000000000021106860837b54c0441487da423df219",
+        "expected": "83d687ee30a61afca0762833e5bf9f65deef979f7c84ab3fbbeb7825bdc20de6"
+      },
+      {
+        "key": "00000000000000000000000000000000f9bf648920d2590bb7ea8c7079664d64",
+        "tweak": "3984e21407542abaaf13314a67a914e3ffffffffffffffffffffffffffffffff",
+        "expected": "c67b1debf8abd54550ecceb59856eb1bb46e416fd01af94777bceafd499c8ea6"
+      }
+    ],
+    "invalid": [
+      {
+        "key": "0000000000000000000000000000000000000000000000000000000000000000",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "key": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "key": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364142",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "key": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "key": "0000000000000000000000000000000000000000000000000000000000000001",
+        "tweak": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+      },
+      {
+        "key": "0000000000000000000000000000000000000000000000000000000000000001",
+        "tweak": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364142"
+      },
+      {
+        "key": "0000000000000000000000000000000000000000000000000000000000000001",
+        "tweak": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      }
+    ]
+  },
   "isPrivate": [
     {
       "description": "== 0",

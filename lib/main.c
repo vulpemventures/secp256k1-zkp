@@ -295,6 +295,20 @@ int ec_seckey_tweak_mul(unsigned char *key, const unsigned char *tweak)
   return ret;
 }
 
+int ec_seckey_tweak_sub(unsigned char *key, const unsigned char *tweak)
+{
+  unsigned char *t = malloc(32);
+  memcpy(t, tweak, 32);
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  int ret = secp256k1_ec_seckey_negate(ctx, t);
+  if (ret == 1)
+  {
+    ret = secp256k1_ec_seckey_tweak_add(ctx, key, (const unsigned char *)t);
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
 int ec_is_valid_xonly_pubkey(const unsigned char *key)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
