@@ -109,9 +109,14 @@ describe('ecc', () => {
       const pubkey = fromHex(f.pubkey);
       const tweak = fromHex(f.tweak);
 
-      const { parity, xOnlyPubkey } = xOnlyPointAddTweak(pubkey, tweak);
-      assert.deepStrictEqual(toHex(xOnlyPubkey), f.expected);
-      assert.deepStrictEqual(parity, f.parity);
+      const result = xOnlyPointAddTweak(pubkey, tweak);
+      if (f.expected === null) {
+        assert.strictEqual(result, null);
+      } else {
+        const { xOnlyPubkey, parity } = result;
+        assert.deepStrictEqual(toHex(xOnlyPubkey), f.expected);
+        assert.deepStrictEqual(parity, f.parity);
+      }
     });
   });
 
