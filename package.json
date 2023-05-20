@@ -37,6 +37,7 @@
     "long": "^4.0.0"
   },
   "devDependencies": {
+    "bip32": "^4.0.0",
     "browserify": "^17.0.0",
     "chai": "^4.3.0",
     "ecpair": "^2.1.0",

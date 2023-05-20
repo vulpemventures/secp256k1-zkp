@@ -452,3 +452,40 @@ int ec_seckey_verify(const unsigned char *seckey)
   secp256k1_context_destroy(ctx);
   return ret;
 }
+
+
+int isZero(const unsigned char *array, size_t size) {
+  for (size_t i = 0; i < size; i++) {
+    if (array[i] != 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int ec_point_add_scalar(unsigned char *output, size_t *output_len, const unsigned char *point, const unsigned char *tweak, int compress)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
+  secp256k1_pubkey pubkey;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey, point, 33);
+  if (ret == 1)
+  {
+    // check if the tweak is zero
+    if (isZero(tweak, 32) == 1)
+    {
+      // if so, just serialize the pubkey
+      ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
+    }
+    else
+    {
+      // otherwise, add the tweak to the pubkey
+      ret = secp256k1_ec_pubkey_tweak_add(ctx, &pubkey, tweak);
+      if (ret == 1)
+      {
+        ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
+      }
+    } 
+  }
+  secp256k1_context_destroy(ctx);
+  return ret;
+} 
