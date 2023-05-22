@@ -20,7 +20,8 @@ describe('ecc', () => {
     isPoint,
     pointFromScalar,
     pointCompress,
-    xOnlyPointAddTweak;
+    xOnlyPointAddTweak,
+    pointAddScalar;
 
   before(async () => {
     ({
@@ -37,6 +38,7 @@ describe('ecc', () => {
       pointFromScalar,
       pointCompress,
       xOnlyPointAddTweak,
+      pointAddScalar,
     } = (await secp256k1()).ecc);
   });
 
@@ -235,6 +237,35 @@ describe('ecc', () => {
         verifySchnorr(fromHex(message), fromHex(publicKey), fromHex(signature)),
         valid
       );
+    }
+  });
+
+  it('pointAddScalar', () => {
+    for (const f of fixtures.pointAddScalar) {
+      const p = fromHex(f.P);
+      const d = fromHex(f.d);
+      const expected = f.expected;
+      let description = `${f.P} + ${f.d} = ${f.expected ? f.expected : null}`;
+      if (f.description) description += ` (${f.description})`;
+      const result = pointAddScalar(p, d);
+      assert.deepStrictEqual(
+        result ? toHex(result) : null,
+        expected,
+        description
+      );
+      if (result !== null) {
+        assert.deepStrictEqual(
+          pointAddScalar(p, d, true),
+          pointCompress(fromHex(expected), true),
+          description + '(compressed)'
+        );
+
+        assert.deepStrictEqual(
+          pointAddScalar(p, d, false),
+          pointCompress(fromHex(expected), false),
+          description + '(uncompressed)'
+        );
+      }
     }
   });
 });
