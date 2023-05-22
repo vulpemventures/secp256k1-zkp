@@ -253,6 +253,19 @@ describe('ecc', () => {
         expected,
         description
       );
+      if (result !== null) {
+        assert.deepStrictEqual(
+          pointAddScalar(p, d, true),
+          pointCompress(fromHex(expected), true),
+          description + '(compressed)'
+        );
+
+        assert.deepStrictEqual(
+          pointAddScalar(p, d, false),
+          pointCompress(fromHex(expected), false),
+          description + '(uncompressed)'
+        );
+      }
     }
   });
 });
