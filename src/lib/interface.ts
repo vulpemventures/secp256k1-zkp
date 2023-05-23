@@ -2,7 +2,7 @@ type Ecdh = (pubkey: Uint8Array, scalar: Uint8Array) => Uint8Array;
 
 interface Ecc {
   privateNegate: (key: Uint8Array) => Uint8Array;
-  privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array | null;
+  privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   privateSub: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   privateMul: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   isPoint: (point: Uint8Array) => boolean;

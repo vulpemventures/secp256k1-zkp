@@ -27,7 +27,7 @@ function privateNegate(cModule: CModule): ZKP['ecc']['privateNegate'] {
 }
 
 function privateAdd(cModule: CModule): ZKP['ecc']['privateAdd'] {
-  return function (key: Uint8Array, tweak: Uint8Array): Uint8Array | null {
+  return function (key: Uint8Array, tweak: Uint8Array): Uint8Array {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32) {
       throw new TypeError('key must be a non-empty Uint8Array of 32 bytes');
     }
@@ -44,7 +44,7 @@ function privateAdd(cModule: CModule): ZKP['ecc']['privateAdd'] {
       [keyPtr, memory.charStar(tweak)]
     );
 
-    let out = null;
+    let out = new Uint8Array();
     if (ret === 1) {
       out = new Uint8Array(cModule.HEAPU8.subarray(keyPtr, keyPtr + 32));
     }
