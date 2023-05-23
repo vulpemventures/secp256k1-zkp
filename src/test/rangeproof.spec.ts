@@ -1,10 +1,10 @@
 import anyTest, { TestInterface } from 'ava';
 
-import fixtures from '../fixtures/rangeproof.json';
+import { loadSecp256k1ZKP } from '../lib/cmodule';
+import { ZKP } from '../lib/interface';
+import { rangeproof } from '../lib/rangeproof';
 
-import { loadSecp256k1ZKP } from './cmodule';
-import { ZKP } from './interface';
-import { rangeproof } from './rangeproof';
+import fixtures from './fixtures/rangeproof.json';
 
 const test = anyTest as TestInterface<ZKP['rangeproof']>;
 

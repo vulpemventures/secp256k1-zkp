@@ -1,10 +1,10 @@
 import anyTest, { TestInterface } from 'ava';
 
-import fixtures from '../fixtures/pedersen.json';
+import { loadSecp256k1ZKP } from '../lib/cmodule';
+import { ZKP } from '../lib/interface';
+import { pedersen } from '../lib/pedersen';
 
-import { loadSecp256k1ZKP } from './cmodule';
-import { ZKP } from './interface';
-import { pedersen } from './pedersen';
+import fixtures from './fixtures/pedersen.json';
 
 const test = anyTest as TestInterface<ZKP['pedersen']>;
 

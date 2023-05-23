@@ -1,10 +1,10 @@
 import anyTest, { TestInterface } from 'ava';
 
-import fixtures from '../fixtures/generator.json';
+import { loadSecp256k1ZKP } from '../lib/cmodule';
+import { generator } from '../lib/generator';
+import { ZKP } from '../lib/interface';
 
-import { loadSecp256k1ZKP } from './cmodule';
-import { generator } from './generator';
-import { ZKP } from './interface';
+import fixtures from './fixtures/generator.json';
 
 const test = anyTest as TestInterface<ZKP['generator']>;
 

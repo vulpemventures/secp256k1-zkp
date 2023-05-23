@@ -1,10 +1,10 @@
 import anyTest, { TestInterface } from 'ava';
 
-import fixtures from '../fixtures/ecdh.json';
+import { loadSecp256k1ZKP } from '../lib/cmodule';
+import { ecdh } from '../lib/ecdh';
+import { ZKP } from '../lib/interface';
 
-import { loadSecp256k1ZKP } from './cmodule';
-import { ecdh } from './ecdh';
-import { ZKP } from './interface';
+import fixtures from './fixtures/ecdh.json';
 
 const test = anyTest as TestInterface<{ ecdh: ZKP['ecdh'] }>;
 

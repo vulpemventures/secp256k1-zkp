@@ -1,10 +1,10 @@
 import anyTest, { TestInterface } from 'ava';
 
-import fixtures from '../fixtures/surjectionproof.json';
+import { loadSecp256k1ZKP } from '../lib/cmodule';
+import { ZKP } from '../lib/interface';
+import { surjectionproof } from '../lib/surjectionproof';
 
-import { loadSecp256k1ZKP } from './cmodule';
-import { ZKP } from './interface';
-import { surjectionproof } from './surjectionproof';
+import fixtures from './fixtures/surjectionproof.json';
 
 const test = anyTest as TestInterface<ZKP['surjectionproof']>;
 
