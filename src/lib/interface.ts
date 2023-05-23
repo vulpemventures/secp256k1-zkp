@@ -2,19 +2,43 @@ type Ecdh = (pubkey: Uint8Array, scalar: Uint8Array) => Uint8Array;
 
 interface Ecc {
   privateNegate: (key: Uint8Array) => Uint8Array;
-  privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array | null;
   privateSub: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   privateMul: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   isPoint: (point: Uint8Array) => boolean;
   isPrivate: (privatePoint: Uint8Array) => boolean;
   pointFromScalar: (scalar: Uint8Array, compressed?: boolean) => Uint8Array;
   pointCompress: (point: Uint8Array, compressed?: boolean) => Uint8Array;
-  xOnlyPointAddTweak: (point: Uint8Array, tweak: Uint8Array) => { parity: 1 | 0, xOnlyPubkey: Uint8Array } | null;
-  sign: (message: Uint8Array, privateKey: Uint8Array, extraEntropy?: Uint8Array) => Uint8Array;
-  verify: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array, strict?: boolean) => boolean;
-  signSchnorr: (message: Uint8Array, privateKey: Uint8Array, extraEntropy?: Uint8Array) => Uint8Array;
-  verifySchnorr: (message: Uint8Array, publicKey: Uint8Array, signature: Uint8Array) => boolean;
-  pointAddScalar: (point: Uint8Array, tweak: Uint8Array, compressed?: boolean) => Uint8Array | null;
+  pointAddScalar(
+    point: Uint8Array,
+    tweak: Uint8Array,
+    compressed?: boolean
+  ): Uint8Array | null;
+  xOnlyPointAddTweak: (
+    point: Uint8Array,
+    tweak: Uint8Array
+  ) => { parity: 1 | 0; xOnlyPubkey: Uint8Array } | null;
+  sign: (
+    message: Uint8Array,
+    privateKey: Uint8Array,
+    extraEntropy?: Uint8Array
+  ) => Uint8Array;
+  verify: (
+    message: Uint8Array,
+    publicKey: Uint8Array,
+    signature: Uint8Array,
+    strict?: boolean
+  ) => boolean;
+  signSchnorr: (
+    message: Uint8Array,
+    privateKey: Uint8Array,
+    extraEntropy?: Uint8Array
+  ) => Uint8Array;
+  verifySchnorr: (
+    message: Uint8Array,
+    publicKey: Uint8Array,
+    signature: Uint8Array
+  ) => boolean;
 }
 
 interface Generator {
@@ -32,7 +56,7 @@ interface Pedersen {
     values: Array<string>,
     assetBlinders: Array<Uint8Array>,
     valueBlinders: Array<Uint8Array>,
-    nInputs: number,
+    nInputs: number
   ): Uint8Array;
 }
 
@@ -101,32 +125,11 @@ interface SurjectionProof {
   ) => boolean;
 }
 
-interface ZKP { 
-  ecdh: Ecdh, 
-  ecc: Ecc, 
-  surjectionproof: SurjectionProof, 
-  rangeproof: RangeProof, 
-  pedersen: Pedersen, 
-  generator: Generator 
+export interface ZKP {
+  ecdh: Ecdh;
+  ecc: Ecc;
+  surjectionproof: SurjectionProof;
+  rangeproof: RangeProof;
+  pedersen: Pedersen;
+  generator: Generator;
 }
-
-declare function secp256k1(): Promise<{
-  ecdh: Ecdh,
-  ecc: Ecc,
-  generator: Generator
-  pedersen: Pedersen,
-  rangeproof: RangeProof,
-  surjectionproof: SurjectionProof,
-}>;
-
-export {
-  ZKP,
-  Ecc,
-  Ecdh,
-  SurjectionProof,
-  RangeProof,
-  Pedersen,
-  Generator
-}
-export default secp256k1;
-

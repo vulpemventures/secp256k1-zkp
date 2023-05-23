@@ -66,7 +66,7 @@ int pedersen_blind_generator_blind_sum(const uint64_t *values, const unsigned ch
   return ret;
 }
 
-int pedersen_commitment(unsigned char *output, uint64_t value, const unsigned char *generator, const unsigned char *blinder)
+int pedersen_commitment(unsigned char *output, uint64_t *value, const unsigned char *generator, const unsigned char *blinder)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_generator gen;
@@ -79,7 +79,7 @@ int pedersen_commitment(unsigned char *output, uint64_t value, const unsigned ch
   }
 
   secp256k1_pedersen_commitment commit;
-  ret = secp256k1_pedersen_commit(ctx, &commit, blinder, value, &gen);
+  ret = secp256k1_pedersen_commit(ctx, &commit, blinder, *value, &gen);
   if (!ret)
   {
     secp256k1_context_destroy(ctx);
@@ -91,7 +91,21 @@ int pedersen_commitment(unsigned char *output, uint64_t value, const unsigned ch
   return ret;
 }
 
-int rangeproof_sign(unsigned char *proof, size_t *plen, uint64_t value, const unsigned char *commit_data, const unsigned char *generator_data, const unsigned char *blind, const unsigned char *nonce, int exp, int min_bits, uint64_t min_value, const unsigned char *message, size_t msg_len, const unsigned char *extra_commit, size_t extra_commit_len)
+int rangeproof_sign(
+    unsigned char *proof,
+    size_t *plen,
+    uint64_t *value,
+    const unsigned char *commit_data,
+    const unsigned char *generator_data,
+    const unsigned char *blind,
+    const unsigned char *nonce,
+    int exp,
+    int min_bits,
+    uint64_t *min_value,
+    const unsigned char *message,
+    size_t msg_len,
+    const unsigned char *extra_commit,
+    size_t extra_commit_len)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_ALL);
   secp256k1_pedersen_commitment commit;
@@ -110,7 +124,7 @@ int rangeproof_sign(unsigned char *proof, size_t *plen, uint64_t value, const un
     return ret;
   }
 
-  ret = secp256k1_rangeproof_sign(ctx, proof, plen, min_value, &commit, blind, nonce, exp, min_bits, value, msg_len > 0 ? message : NULL, msg_len, extra_commit_len > 0 ? extra_commit : NULL, extra_commit_len, &gen);
+  ret = secp256k1_rangeproof_sign(ctx, proof, plen, *min_value, &commit, blind, nonce, exp, min_bits, *value, msg_len > 0 ? message : NULL, msg_len, extra_commit_len > 0 ? extra_commit : NULL, extra_commit_len, &gen);
   secp256k1_context_destroy(ctx);
   return ret;
 }
@@ -329,7 +343,8 @@ int ec_is_valid_pubkey(const unsigned char *key, size_t key_len)
 
 int ec_is_point(const unsigned char *key, size_t key_len)
 {
-  if (key_len == 32) {
+  if (key_len == 32)
+  {
     return ec_is_valid_xonly_pubkey(key);
   }
 
@@ -453,10 +468,12 @@ int ec_seckey_verify(const unsigned char *seckey)
   return ret;
 }
 
-
-int isZero(const unsigned char *array, size_t size) {
-  for (size_t i = 0; i < size; i++) {
-    if (array[i] != 0) {
+int isZero(const unsigned char *array, size_t size)
+{
+  for (size_t i = 0; i < size; i++)
+  {
+    if (array[i] != 0)
+    {
       return 0;
     }
   }
@@ -484,8 +501,8 @@ int ec_point_add_scalar(unsigned char *output, size_t *output_len, const unsigne
       {
         ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &pubkey, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
       }
-    } 
+    }
   }
   secp256k1_context_destroy(ctx);
   return ret;
-} 
+}

@@ -1,0 +1,4 @@
+# package.json is formatted by package managers, so we ignore it here
+package.json
+# ignore the generated file
+src/lib/secp256k1-zkp.js
