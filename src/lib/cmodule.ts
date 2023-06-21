@@ -1,5 +1,6 @@
 /// <reference types="emscripten" />
-import lib from './secp256k1-zkp';
+
+import lib from './secp256k1-zkp.js';
 
 export interface CModule extends EmscriptenModule {
   ccall: typeof ccall;

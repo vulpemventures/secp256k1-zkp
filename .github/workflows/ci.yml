@@ -22,9 +22,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Compile secp256k1-zkp
-        run: yarn compile
-
       - name: Install dependencies
         run: yarn install
 
