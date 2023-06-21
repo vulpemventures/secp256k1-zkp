@@ -1,18 +1,21 @@
-type Ecdh = (pubkey: Uint8Array, scalar: Uint8Array) => Uint8Array;
+export type Ecdh = (pubkey: Uint8Array, scalar: Uint8Array) => Uint8Array;
 
-interface Ecc {
+export interface Ecc {
   privateNegate: (key: Uint8Array) => Uint8Array;
   privateAdd: (key: Uint8Array, tweak: Uint8Array) => Uint8Array | null;
-  privateSub: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
+  privateSub: (key: Uint8Array, tweak: Uint8Array) => Uint8Array | null;
   privateMul: (key: Uint8Array, tweak: Uint8Array) => Uint8Array;
   isPoint: (point: Uint8Array) => boolean;
   isPrivate: (privatePoint: Uint8Array) => boolean;
-  pointFromScalar: (scalar: Uint8Array, compressed?: boolean) => Uint8Array;
+  pointFromScalar: (
+    scalar: Uint8Array,
+    compressed?: boolean
+  ) => Uint8Array | null;
   pointCompress: (point: Uint8Array, compressed?: boolean) => Uint8Array;
   pointAddScalar(
     point: Uint8Array,
     tweak: Uint8Array,
-    compressed?: boolean
+    returnCompressed?: boolean // defaults to true
   ): Uint8Array | null;
   xOnlyPointAddTweak: (
     point: Uint8Array,
@@ -41,12 +44,12 @@ interface Ecc {
   ) => boolean;
 }
 
-interface Generator {
+export interface Generator {
   generate: (seed: Uint8Array) => Uint8Array;
   generateBlinded(key: Uint8Array, blinder: Uint8Array): Uint8Array;
 }
 
-interface Pedersen {
+export interface Pedersen {
   commitment(
     value: string,
     generator: Uint8Array,
@@ -60,7 +63,7 @@ interface Pedersen {
   ): Uint8Array;
 }
 
-interface RangeProof {
+export interface RangeProof {
   info(proof: Uint8Array): {
     exp: string;
     mantissa: string;
@@ -100,7 +103,7 @@ interface RangeProof {
   };
 }
 
-interface SurjectionProof {
+export interface SurjectionProof {
   initialize: (
     inputTags: Array<Uint8Array>,
     outputTag: Uint8Array,
@@ -125,7 +128,7 @@ interface SurjectionProof {
   ) => boolean;
 }
 
-export interface ZKP {
+export interface Secp256k1ZKP {
   ecdh: Ecdh;
   ecc: Ecc;
   surjectionproof: SurjectionProof;

@@ -30,6 +30,14 @@ async function main() {
 
 ```
 
+## Documentation
+
+Typedoc html page is available via:
+
+```bash
+yarn doc
+```
+
 ## Development
 
 Fetch submodules

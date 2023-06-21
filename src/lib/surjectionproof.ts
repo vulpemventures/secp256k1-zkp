@@ -1,8 +1,10 @@
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-function initialize(cModule: CModule): ZKP['surjectionproof']['initialize'] {
+function initialize(
+  cModule: CModule
+): Secp256k1ZKP['surjectionproof']['initialize'] {
   return function surjectionProofInitialize(
     inputTags: Uint8Array[],
     outputTag: Uint8Array,
@@ -78,7 +80,9 @@ function initialize(cModule: CModule): ZKP['surjectionproof']['initialize'] {
   };
 }
 
-function generate(cModule: CModule): ZKP['surjectionproof']['generate'] {
+function generate(
+  cModule: CModule
+): Secp256k1ZKP['surjectionproof']['generate'] {
   return function surjectionProofGenerate(
     proofData: Uint8Array,
     inputTags: Uint8Array[],
@@ -174,7 +178,7 @@ function generate(cModule: CModule): ZKP['surjectionproof']['generate'] {
   };
 }
 
-function verify(cModule: CModule): ZKP['surjectionproof']['verify'] {
+function verify(cModule: CModule): Secp256k1ZKP['surjectionproof']['verify'] {
   return function surjectionProofVerify(
     proof: Uint8Array,
     inputTags: Uint8Array[],
@@ -217,7 +221,9 @@ function verify(cModule: CModule): ZKP['surjectionproof']['verify'] {
   };
 }
 
-export function surjectionproof(cModule: CModule): ZKP['surjectionproof'] {
+export function surjectionproof(
+  cModule: CModule
+): Secp256k1ZKP['surjectionproof'] {
   return {
     initialize: initialize(cModule),
     generate: generate(cModule),

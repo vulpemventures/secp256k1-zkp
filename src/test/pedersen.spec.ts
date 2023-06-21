@@ -1,12 +1,12 @@
 import anyTest, { TestInterface } from 'ava';
 
 import { loadSecp256k1ZKP } from '../lib/cmodule';
-import { ZKP } from '../lib/interface';
+import { Secp256k1ZKP } from '../lib/interface';
 import { pedersen } from '../lib/pedersen';
 
 import fixtures from './fixtures/pedersen.json';
 
-const test = anyTest as TestInterface<ZKP['pedersen']>;
+const test = anyTest as TestInterface<Secp256k1ZKP['pedersen']>;
 
 test.before(async (t) => {
   const cModule = await loadSecp256k1ZKP();

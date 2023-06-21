@@ -2,14 +2,14 @@ import anyTest, { TestInterface } from 'ava';
 
 import { loadSecp256k1ZKP } from '../lib/cmodule';
 import { ecc } from '../lib/ecc';
-import { ZKP } from '../lib/interface';
+import { Secp256k1ZKP } from '../lib/interface';
 
 import fixtures from './fixtures/ecc.json';
 
 const fromHex = (hex: string) => Buffer.from(hex, 'hex');
 const toHex = (buf: Uint8Array) => Buffer.from(buf).toString('hex');
 
-const test = anyTest as TestInterface<ZKP['ecc']>;
+const test = anyTest as TestInterface<Secp256k1ZKP['ecc']>;
 
 test.before(async (t) => {
   const cModule = await loadSecp256k1ZKP();
@@ -42,7 +42,18 @@ test('privateSub', (t) => {
   fixtures.privateSub.valid.forEach((f) => {
     const key = fromHex(f.key);
     const tweak = fromHex(f.tweak);
-    t.is(toHex(privateSub(key, tweak)), f.expected);
+    const result = privateSub(key, tweak);
+    if (f.expected === null) {
+      t.is(result, null);
+      return;
+    }
+
+    if (result === null) {
+      t.fail();
+      return;
+    }
+
+    t.is(toHex(result), f.expected);
   });
   fixtures.privateSub.invalid.forEach((f) => {
     const key = fromHex(f.key);
@@ -86,7 +97,17 @@ test('pointFromScalar', (t) => {
 
   for (const f of fixtures.pointFromScalar) {
     const scalar = fromHex(f.scalar);
-    const result = toHex(pointFromScalar(scalar));
+    if (f.expected === null) {
+      t.is(pointFromScalar(scalar), null);
+      continue;
+    }
+
+    const fromScalar = pointFromScalar(scalar);
+    if (fromScalar === null) {
+      t.fail();
+      return;
+    }
+    const result = toHex(fromScalar);
     t.is(result, f.expected, `result: ${result} = expected: ${f.expected}`);
   }
 });

@@ -1,8 +1,8 @@
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-function privateNegate(cModule: CModule): ZKP['ecc']['privateNegate'] {
+function privateNegate(cModule: CModule): Secp256k1ZKP['ecc']['privateNegate'] {
   return function (key: Uint8Array): Uint8Array {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32) {
       throw new TypeError('key must be a non-empty Uint8Array of 32 bytes');
@@ -26,7 +26,7 @@ function privateNegate(cModule: CModule): ZKP['ecc']['privateNegate'] {
   };
 }
 
-function privateAdd(cModule: CModule): ZKP['ecc']['privateAdd'] {
+function privateAdd(cModule: CModule): Secp256k1ZKP['ecc']['privateAdd'] {
   return function (key: Uint8Array, tweak: Uint8Array): Uint8Array | null {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32) {
       throw new TypeError('key must be a non-empty Uint8Array of 32 bytes');
@@ -53,7 +53,7 @@ function privateAdd(cModule: CModule): ZKP['ecc']['privateAdd'] {
   };
 }
 
-function privateSub(cModule: CModule): ZKP['ecc']['privateSub'] {
+function privateSub(cModule: CModule): Secp256k1ZKP['ecc']['privateSub'] {
   return function (key: Uint8Array, tweak: Uint8Array) {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32) {
       throw new TypeError('key must be a non-empty Uint8Array of 32 bytes');
@@ -77,11 +77,11 @@ function privateSub(cModule: CModule): ZKP['ecc']['privateSub'] {
       return out;
     }
     memory.free();
-    throw new Error('ec_seckey_tweak_sub');
+    return null;
   };
 }
 
-function privateMul(cModule: CModule): ZKP['ecc']['privateMul'] {
+function privateMul(cModule: CModule): Secp256k1ZKP['ecc']['privateMul'] {
   return function (key: Uint8Array, tweak: Uint8Array) {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32) {
       throw new TypeError('key must be a non-empty Uint8Array of 32 bytes');
@@ -109,7 +109,7 @@ function privateMul(cModule: CModule): ZKP['ecc']['privateMul'] {
   };
 }
 
-function isPoint(cModule: CModule): ZKP['ecc']['isPoint'] {
+function isPoint(cModule: CModule): Secp256k1ZKP['ecc']['isPoint'] {
   return function (point: Uint8Array) {
     if (!point || !(point instanceof Uint8Array)) {
       throw new TypeError('point must be a Uint8Array');
@@ -128,7 +128,7 @@ function isPoint(cModule: CModule): ZKP['ecc']['isPoint'] {
   };
 }
 
-function pointCompress(cModule: CModule): ZKP['ecc']['pointCompress'] {
+function pointCompress(cModule: CModule): Secp256k1ZKP['ecc']['pointCompress'] {
   return function (point: Uint8Array, compress = true) {
     if (!point || !(point instanceof Uint8Array)) {
       throw new TypeError('point must be a Uint8Array');
@@ -163,7 +163,7 @@ function pointCompress(cModule: CModule): ZKP['ecc']['pointCompress'] {
   };
 }
 
-function isPrivate(cModule: CModule): ZKP['ecc']['isPrivate'] {
+function isPrivate(cModule: CModule): Secp256k1ZKP['ecc']['isPrivate'] {
   return function (point: Uint8Array) {
     if (!point || !(point instanceof Uint8Array)) {
       throw new TypeError('point must be a Uint8Array');
@@ -177,7 +177,9 @@ function isPrivate(cModule: CModule): ZKP['ecc']['isPrivate'] {
   };
 }
 
-function pointFromScalar(cModule: CModule): ZKP['ecc']['pointFromScalar'] {
+function pointFromScalar(
+  cModule: CModule
+): Secp256k1ZKP['ecc']['pointFromScalar'] {
   return function (scalar: Uint8Array, compress = true) {
     if (!scalar || !(scalar instanceof Uint8Array)) {
       throw new TypeError('scalar must be a Uint8Array');
@@ -201,7 +203,7 @@ function pointFromScalar(cModule: CModule): ZKP['ecc']['pointFromScalar'] {
       return res;
     }
     memory.free();
-    throw new Error('point_from_scalar');
+    return null;
   };
 }
 
@@ -211,7 +213,7 @@ function validateParity(n: number): n is 1 | 0 {
 
 function xOnlyPointAddTweak(
   cModule: CModule
-): ZKP['ecc']['xOnlyPointAddTweak'] {
+): Secp256k1ZKP['ecc']['xOnlyPointAddTweak'] {
   return function (point: Uint8Array, tweak: Uint8Array) {
     if (!point || !(point instanceof Uint8Array) || point.length !== 32) {
       throw new TypeError('point must be a Uint8Array of 32 bytes');
@@ -246,7 +248,7 @@ function xOnlyPointAddTweak(
   };
 }
 
-function signECDSA(cModule: CModule): ZKP['ecc']['sign'] {
+function signECDSA(cModule: CModule): Secp256k1ZKP['ecc']['sign'] {
   return function (
     message: Uint8Array,
     privateKey: Uint8Array,
@@ -288,7 +290,7 @@ function signECDSA(cModule: CModule): ZKP['ecc']['sign'] {
   };
 }
 
-function verifyECDSA(cModule: CModule): ZKP['ecc']['verify'] {
+function verifyECDSA(cModule: CModule): Secp256k1ZKP['ecc']['verify'] {
   return function (
     message: Uint8Array,
     publicKey: Uint8Array,
@@ -326,7 +328,7 @@ function verifyECDSA(cModule: CModule): ZKP['ecc']['verify'] {
   };
 }
 
-function signSchnorr(cModule: CModule): ZKP['ecc']['signSchnorr'] {
+function signSchnorr(cModule: CModule): Secp256k1ZKP['ecc']['signSchnorr'] {
   return function (
     message: Uint8Array,
     privateKey: Uint8Array,
@@ -369,7 +371,7 @@ function signSchnorr(cModule: CModule): ZKP['ecc']['signSchnorr'] {
   };
 }
 
-function verifySchnorr(cModule: CModule): ZKP['ecc']['verifySchnorr'] {
+function verifySchnorr(cModule: CModule): Secp256k1ZKP['ecc']['verifySchnorr'] {
   return function (
     message: Uint8Array,
     publicKey: Uint8Array,
@@ -402,7 +404,9 @@ function verifySchnorr(cModule: CModule): ZKP['ecc']['verifySchnorr'] {
   };
 }
 
-function pointAddScalar(cModule: CModule): ZKP['ecc']['pointAddScalar'] {
+function pointAddScalar(
+  cModule: CModule
+): Secp256k1ZKP['ecc']['pointAddScalar'] {
   return function (point: Uint8Array, tweak: Uint8Array, compressed = true) {
     if (!point || !(point instanceof Uint8Array) || point.length !== 33) {
       throw new TypeError('point must be a Uint8Array of length 33');
@@ -441,7 +445,7 @@ function pointAddScalar(cModule: CModule): ZKP['ecc']['pointAddScalar'] {
   };
 }
 
-export function ecc(cModule: CModule): ZKP['ecc'] {
+export function ecc(cModule: CModule): Secp256k1ZKP['ecc'] {
   return {
     isPoint: isPoint(cModule),
     pointAddScalar: pointAddScalar(cModule),

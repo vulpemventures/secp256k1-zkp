@@ -1,12 +1,12 @@
 import anyTest, { TestInterface } from 'ava';
 
 import { loadSecp256k1ZKP } from '../lib/cmodule';
-import { ZKP } from '../lib/interface';
+import { Secp256k1ZKP } from '../lib/interface';
 import { rangeproof } from '../lib/rangeproof';
 
 import fixtures from './fixtures/rangeproof.json';
 
-const test = anyTest as TestInterface<ZKP['rangeproof']>;
+const test = anyTest as TestInterface<Secp256k1ZKP['rangeproof']>;
 
 test.before(async (t) => {
   const cModule = await loadSecp256k1ZKP();

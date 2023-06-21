@@ -1,8 +1,8 @@
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-export function ecdh(cModule: CModule): ZKP['ecdh'] {
+export function ecdh(cModule: CModule): Secp256k1ZKP['ecdh'] {
   return function (pubkey: Uint8Array, scalar: Uint8Array): Uint8Array {
     const memory = new Memory(cModule);
     const output = memory.malloc(32);

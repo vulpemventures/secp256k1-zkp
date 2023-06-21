@@ -2,11 +2,11 @@ import anyTest, { TestInterface } from 'ava';
 
 import { loadSecp256k1ZKP } from '../lib/cmodule';
 import { ecdh } from '../lib/ecdh';
-import { ZKP } from '../lib/interface';
+import { Secp256k1ZKP } from '../lib/interface';
 
 import fixtures from './fixtures/ecdh.json';
 
-const test = anyTest as TestInterface<{ ecdh: ZKP['ecdh'] }>;
+const test = anyTest as TestInterface<{ ecdh: Secp256k1ZKP['ecdh'] }>;
 
 test.before(async (t) => {
   const cModule = await loadSecp256k1ZKP();

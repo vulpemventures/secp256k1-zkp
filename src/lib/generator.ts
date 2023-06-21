@@ -1,8 +1,8 @@
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-function generate(cModule: CModule): ZKP['generator']['generate'] {
+function generate(cModule: CModule): Secp256k1ZKP['generator']['generate'] {
   return function (seed: Uint8Array) {
     if (!seed || !(seed instanceof Uint8Array) || seed.length !== 32) {
       throw new TypeError('seed must be a Uint8Array of 32 bytes');
@@ -29,7 +29,7 @@ function generate(cModule: CModule): ZKP['generator']['generate'] {
 
 function generateBlinded(
   cModule: CModule
-): ZKP['generator']['generateBlinded'] {
+): Secp256k1ZKP['generator']['generateBlinded'] {
   return function (key, blinder) {
     if (!key || !(key instanceof Uint8Array) || key.length !== 32)
       throw new TypeError('key must be a Uint8Array of 32 bytes');
@@ -57,7 +57,7 @@ function generateBlinded(
   };
 }
 
-export function generator(cModule: CModule): ZKP['generator'] {
+export function generator(cModule: CModule): Secp256k1ZKP['generator'] {
   return {
     generate: generate(cModule),
     generateBlinded: generateBlinded(cModule),

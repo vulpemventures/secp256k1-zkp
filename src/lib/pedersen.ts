@@ -1,10 +1,10 @@
 import Long from 'long';
 
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-function commitment(cModule: CModule): ZKP['pedersen']['commitment'] {
+function commitment(cModule: CModule): Secp256k1ZKP['pedersen']['commitment'] {
   return function (value: string, generator: Uint8Array, blinder: Uint8Array) {
     if (
       !generator ||
@@ -44,7 +44,7 @@ function commitment(cModule: CModule): ZKP['pedersen']['commitment'] {
 
 function blindGeneratorBlindSum(
   cModule: CModule
-): ZKP['pedersen']['blindGeneratorBlindSum'] {
+): Secp256k1ZKP['pedersen']['blindGeneratorBlindSum'] {
   return function (
     values: string[],
     assetBlinders: Uint8Array[],
@@ -93,7 +93,7 @@ function blindGeneratorBlindSum(
   };
 }
 
-export function pedersen(cModule: CModule): ZKP['pedersen'] {
+export function pedersen(cModule: CModule): Secp256k1ZKP['pedersen'] {
   return {
     commitment: commitment(cModule),
     blindGeneratorBlindSum: blindGeneratorBlindSum(cModule),

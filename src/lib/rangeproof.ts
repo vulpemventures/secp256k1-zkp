@@ -1,10 +1,10 @@
 import Long from 'long';
 
 import { CModule } from './cmodule';
-import { ZKP } from './interface';
+import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
-function sign(cModule: CModule): ZKP['rangeproof']['sign'] {
+function sign(cModule: CModule): Secp256k1ZKP['rangeproof']['sign'] {
   return function rangeProofSign(
     value: string,
     valueCommitment: Uint8Array,
@@ -101,7 +101,7 @@ function sign(cModule: CModule): ZKP['rangeproof']['sign'] {
   };
 }
 
-function info(cModule: CModule): ZKP['rangeproof']['info'] {
+function info(cModule: CModule): Secp256k1ZKP['rangeproof']['info'] {
   return function rangeProofInfo(proof: Uint8Array) {
     if (!proof || !(proof instanceof Uint8Array) || !proof.length)
       throw new TypeError('proof must be a non empty Uint8Array');
@@ -135,7 +135,7 @@ function info(cModule: CModule): ZKP['rangeproof']['info'] {
   };
 }
 
-function verify(cModule: CModule): ZKP['rangeproof']['verify'] {
+function verify(cModule: CModule): Secp256k1ZKP['rangeproof']['verify'] {
   return function rangeProofVerify(
     proof: Uint8Array,
     valueCommitment: Uint8Array,
@@ -288,7 +288,7 @@ function rewind(cModule: CModule) {
   };
 }
 
-export function rangeproof(cModule: CModule): ZKP['rangeproof'] {
+export function rangeproof(cModule: CModule): Secp256k1ZKP['rangeproof'] {
   return {
     info: info(cModule),
     rewind: rewind(cModule),

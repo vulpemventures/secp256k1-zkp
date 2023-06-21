@@ -29,8 +29,8 @@
     "cov:send": "run-s cov:lcov && codecov",
     "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
     "doc": "run-s doc:html && open-cli build/docs/index.html",
-    "doc:html": "typedoc src/ --exclude **/*.spec.ts --exclude *.js --target ES6 --mode file --out build/docs",
-    "doc:json": "typedoc src/ --exclude **/*.spec.ts --exclude *.js --target ES6 --mode file --json build/docs/typedoc.json",
+    "doc:html": "typedoc src/index.ts --tsconfig tsconfig.prod.module.json --out build/docs",
+    "doc:json": "typedoc src/index.ts --tsconfig tsconfig.prod.module.json --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && yarn",
@@ -66,7 +66,7 @@
     "prettier": "^2.1.1",
     "standard-version": "^9.0.0",
     "ts-node": "^9.0.0",
-    "typedoc": "^0.19.0",
+    "typedoc": "^0.24.8",
     "typescript": "^4.0.2"
   },
   "files": [

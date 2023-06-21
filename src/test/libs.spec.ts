@@ -3,9 +3,9 @@ import { BIP32Factory } from 'bip32';
 import { ECPairFactory } from 'ecpair';
 
 import secp256k1 from '../index';
-import { ZKP } from '../lib/interface';
+import { Secp256k1ZKP } from '../lib/interface';
 
-const test = anyTest as TestInterface<ZKP>;
+const test = anyTest as TestInterface<Secp256k1ZKP>;
 
 test.before(async (t) => {
   t.context = await secp256k1();
