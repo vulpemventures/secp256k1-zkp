@@ -58,9 +58,7 @@ test('privateSub', (t) => {
   fixtures.privateSub.invalid.forEach((f) => {
     const key = fromHex(f.key);
     const tweak = fromHex(f.tweak);
-    t.throws(() => {
-      privateSub(key, tweak);
-    });
+    t.is(privateSub(key, tweak), null);
   });
 });
 
