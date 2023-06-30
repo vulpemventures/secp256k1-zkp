@@ -1,8 +1,9 @@
-node_modules
-Makefile
-coverage
+.idea/*
+.nyc_output
 build
-./test
-.vscode
-settings.json
-**/*bundle*
+node_modules
+src/**.js
+coverage
+*.log
+package-lock.json
+dist
