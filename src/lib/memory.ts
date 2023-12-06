@@ -3,6 +3,7 @@ import Long from 'long';
 import { CModule } from './cmodule';
 
 interface MemoryI {
+  charStarToUint8(ptr: number, size: number): Uint8Array;
   malloc(size: number): number;
   charStar(buffer: Uint8Array): number;
   charStarArray(buffers: Uint8Array[]): number;
@@ -14,6 +15,10 @@ export default class Memory implements MemoryI {
   private toFree: number[] = [];
 
   constructor(private cModule: CModule) {}
+
+  charStarToUint8(ptr: number, size: number): Uint8Array {
+    return new Uint8Array(this.cModule.HEAPU8.subarray(ptr, ptr + size));
+  }
 
   malloc(size: number): number {
     const ret = this.cModule._malloc(size);
