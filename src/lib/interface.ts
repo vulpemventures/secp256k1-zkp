@@ -164,7 +164,10 @@ export interface Musig {
     keyaggCache: Uint8Array,
     tweak: Uint8Array,
     compress?: boolean
-  ): Uint8Array;
+  ): {
+    pubkey: Uint8Array;
+    keyaggCache: Uint8Array;
+  };
 }
 
 export interface Secp256k1ZKP {

@@ -136,8 +136,8 @@ test('pubkeyXonlyTweakAdd', (t) => {
       f.compress
     );
 
-    t.is(tweaked.length, f.tweakedLength);
-    t.is(uintToString(tweaked), f.tweaked);
+    t.is(tweaked.pubkey.length, f.tweakedLength);
+    t.is(uintToString(tweaked.pubkey), f.tweaked);
   });
 });
 
@@ -185,4 +185,55 @@ test('full example', (t) => {
   // Combine the partial signatures into one and verify it
   const sig = musig.partialSigAgg(session, partialSigs);
   t.true(musig.ecc.verifySchnorr(message, pubkeyAgg.aggPubkey, sig));
+});
+
+test('full example tweaked', (t) => {
+  const musig = t.context;
+
+  const privateKeys = fixtures.fullExample.privateKeys.map((key) =>
+    fromHex(key)
+  );
+  const publicKeys = privateKeys.map((key) =>
+    musig.ec.fromPrivateKey(key).publicKey.subarray(1)
+  );
+  t.is(publicKeys.length, privateKeys.length);
+
+  const pubkeyAgg = musig.pubkeyAgg(publicKeys);
+  const tweak = musig.pubkeyXonlyTweakAdd(
+    pubkeyAgg.keyaggCache,
+    randomBytes(32),
+    true
+  );
+
+  const nonces = publicKeys.map(() => musig.nonceGen(randomBytes(32)));
+  const nonceAgg = musig.nonceAgg(nonces.map((nonce) => nonce.pubNonce));
+
+  const message = randomBytes(32);
+  const session = musig.nonceProcess(nonceAgg, message, tweak.keyaggCache);
+
+  const partialSigs = privateKeys.map((privateKey, i) =>
+    musig.partialSign(
+      nonces[i].secNonce,
+      privateKey,
+      tweak.keyaggCache,
+      session
+    )
+  );
+
+  // Verify each partial signature individually, to make sure they are fine on their own
+  partialSigs.forEach((sig, i) =>
+    t.true(
+      musig.partialVerify(
+        sig,
+        nonces[i].pubNonce,
+        publicKeys[i],
+        tweak.keyaggCache,
+        session
+      )
+    )
+  );
+
+  // Combine the partial signatures into one and verify it
+  const sig = musig.partialSigAgg(session, partialSigs);
+  t.true(musig.ecc.verifySchnorr(message, tweak.pubkey.slice(1), sig));
 });

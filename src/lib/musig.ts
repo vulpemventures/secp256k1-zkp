@@ -303,6 +303,8 @@ function pubkeyXonlyTweakAdd(
     const outputLen = memory.malloc(8);
     cModule.setValue(outputLen, 65, 'i64');
 
+    const keyaggCacheTweaked = memory.charStar(keyaggCache);
+
     const ret = cModule.ccall(
       'musig_pubkey_xonly_tweak_add',
       'number',
@@ -311,7 +313,7 @@ function pubkeyXonlyTweakAdd(
         output,
         outputLen,
         compress ? 1 : 0,
-        memory.charStar(keyaggCache),
+        keyaggCacheTweaked,
         memory.charStar(tweak),
       ]
     );
@@ -321,12 +323,20 @@ function pubkeyXonlyTweakAdd(
       throw new Error('musig_pubkey_xonly_tweak_add');
     }
 
-    const res = memory.charStarToUint8(
+    const pubkey = memory.charStarToUint8(
       output,
       cModule.getValue(outputLen, 'i64')
     );
+    const keyaggCacheTweakedRes = memory.charStarToUint8(
+      keyaggCacheTweaked,
+      165
+    );
+
     memory.free();
-    return res;
+    return {
+      pubkey,
+      keyaggCache: keyaggCacheTweakedRes,
+    };
   };
 }
 
