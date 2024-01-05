@@ -40,6 +40,8 @@ emcc -O$OPTIMIZATION_LEVEL \
     -s SINGLE_FILE=1 \
     -s ALLOW_MEMORY_GROWTH=1 \
     -I${SECP256K1_SOURCE_DIR}/include \
-    ${SECP256K1_SOURCE_DIR}/src/*.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_la-secp256k1.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_precomputed_la-precomputed_ecmult.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_precomputed_la-precomputed_ecmult_gen.o \
     ./main.c \
     -o ./dist/secp256k1-zkp.js

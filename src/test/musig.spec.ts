@@ -36,7 +36,7 @@ test('pubkeyAgg', (t) => {
 
     t.is(res.aggPubkey.length, 32);
     t.is(uintToString(res.aggPubkey), f.aggregatedPubkey);
-    t.is(res.keyaggCache.length, 165);
+    t.is(res.keyaggCache.length, 197);
     t.is(uintToString(res.keyaggCache), f.keyaggCache);
   });
 });
@@ -45,10 +45,11 @@ test('nonceGen', (t) => {
   const { nonceGen } = t.context;
 
   fixtures.musigNonceGen.forEach((f) => {
+    const pubKey = fromHex(f.publicKey);
     const session = fromHex(f.sessionId);
-    const nonces = nonceGen(session);
+    const nonces = nonceGen(session, pubKey);
 
-    t.is(nonces.secNonce.length, 68);
+    t.is(nonces.secNonce.length, 132);
     t.is(uintToString(nonces.secNonce), f.secnonce);
     t.is(nonces.pubNonce.length, 66);
     t.is(uintToString(nonces.pubNonce), f.pubnonce);
@@ -83,14 +84,30 @@ test('nonceProcess', (t) => {
 });
 
 test('partialSign', (t) => {
-  const { partialSign } = t.context;
+  const musig = t.context;
 
   fixtures.musigPartialSign.forEach((f) => {
-    const partialSig = partialSign(
-      fromHex(f.secnonce),
+    const publicKeys = f.publicKeys.map(fromHex);
+    const signer = musig.ec.fromPrivateKey(fromHex(f.privateKey));
+    publicKeys[f.index] = signer.publicKey;
+
+    const pubNonces: Uint8Array[] = f.pubnonces.map(fromHex);
+    const signerNonces = musig.nonceGen(fromHex(f.sessionId), signer.publicKey);
+    pubNonces[f.index] = signerNonces.pubNonce;
+
+    const pubkeyAgg = musig.pubkeyAgg(publicKeys);
+    const nonceAgg = musig.nonceAgg(pubNonces);
+    const session = musig.nonceProcess(
+      nonceAgg,
+      fromHex(f.msg),
+      pubkeyAgg.keyaggCache
+    );
+
+    const partialSig = musig.partialSign(
+      signerNonces.secNonce,
       fromHex(f.privateKey),
-      fromHex(f.keyaggCache),
-      fromHex(f.session)
+      pubkeyAgg.keyaggCache,
+      session
     );
     t.is(partialSig.length, 32);
     t.is(uintToString(partialSig), f.partialSig);
@@ -98,16 +115,28 @@ test('partialSign', (t) => {
 });
 
 test('partialVerify', (t) => {
-  const { partialVerify } = t.context;
+  const musig = t.context;
 
   fixtures.musigPatialVerify.forEach((f) => {
+    const publicKeys = f.publicKeys.map(fromHex);
+    const pubkeyAgg = musig.pubkeyAgg(publicKeys);
+
+    const pubNonces = f.pubnonces.map(fromHex);
+    const nonceAgg = musig.nonceAgg(pubNonces);
+
+    const session = musig.nonceProcess(
+      nonceAgg,
+      fromHex(f.msg),
+      pubkeyAgg.keyaggCache
+    );
+
     t.is(
-      partialVerify(
+      musig.partialVerify(
         fromHex(f.partialSig),
-        fromHex(f.pubnonce),
-        fromHex(f.publicKey),
-        fromHex(f.keyaggCache),
-        fromHex(f.session)
+        pubNonces[f.index],
+        publicKeys[f.index],
+        pubkeyAgg.keyaggCache,
+        session
       ),
       f.result
     );
@@ -115,14 +144,23 @@ test('partialVerify', (t) => {
 });
 
 test('partialSigAgg', (t) => {
-  const { partialSigAgg } = t.context;
+  const musig = t.context;
 
   fixtures.musigPartialSigAgg.forEach((f) => {
-    const partialSigs = f.partialSigs.map((sig) => fromHex(sig));
-    const aggregated = partialSigAgg(fromHex(f.session), partialSigs);
+    const pubkeyAgg = musig.pubkeyAgg(f.publicKeys.map(fromHex));
+
+    const nonceAgg = musig.nonceAgg(f.pubnonces.map(fromHex));
+    t.is(uintToString(nonceAgg), f.aggnonce);
+
+    const msg = fromHex(f.msg);
+    const session = musig.nonceProcess(nonceAgg, msg, pubkeyAgg.keyaggCache);
+
+    const partialSigs = f.partialSigs.map(fromHex);
+    const aggregated = musig.partialSigAgg(session, partialSigs);
 
     t.is(aggregated.length, 64);
     t.is(uintToString(aggregated), f.aggregatedSignature);
+    t.true(musig.ecc.verifySchnorr(msg, pubkeyAgg.aggPubkey, aggregated));
   });
 });
 
@@ -144,17 +182,17 @@ test('pubkeyXonlyTweakAdd', (t) => {
 test('full example', (t) => {
   const musig = t.context;
 
-  const privateKeys = fixtures.fullExample.privateKeys.map((key) =>
-    fromHex(key)
-  );
-  const publicKeys = privateKeys.map((key) =>
-    musig.ec.fromPrivateKey(key).publicKey.subarray(1)
+  const privateKeys = fixtures.fullExample.privateKeys.map(fromHex);
+  const publicKeys = privateKeys.map(
+    (key) => musig.ec.fromPrivateKey(key).publicKey
   );
   t.is(publicKeys.length, privateKeys.length);
 
   const pubkeyAgg = musig.pubkeyAgg(publicKeys);
 
-  const nonces = publicKeys.map(() => musig.nonceGen(randomBytes(32)));
+  const nonces = publicKeys.map((publicKey) =>
+    musig.nonceGen(randomBytes(32), publicKey)
+  );
   const nonceAgg = musig.nonceAgg(nonces.map((nonce) => nonce.pubNonce));
 
   const message = randomBytes(32);
@@ -193,8 +231,8 @@ test('full example tweaked', (t) => {
   const privateKeys = fixtures.fullExample.privateKeys.map((key) =>
     fromHex(key)
   );
-  const publicKeys = privateKeys.map((key) =>
-    musig.ec.fromPrivateKey(key).publicKey.subarray(1)
+  const publicKeys = privateKeys.map(
+    (key) => musig.ec.fromPrivateKey(key).publicKey
   );
   t.is(publicKeys.length, privateKeys.length);
 
@@ -205,7 +243,9 @@ test('full example tweaked', (t) => {
     true
   );
 
-  const nonces = publicKeys.map(() => musig.nonceGen(randomBytes(32)));
+  const nonces = publicKeys.map((publicKey) =>
+    musig.nonceGen(randomBytes(32), publicKey)
+  );
   const nonceAgg = musig.nonceAgg(nonces.map((nonce) => nonce.pubNonce));
 
   const message = randomBytes(32);

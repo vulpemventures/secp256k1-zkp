@@ -129,11 +129,14 @@ export interface SurjectionProof {
 }
 
 export interface Musig {
-  pubkeyAgg(pubkeys: Array<Uint8Array>): {
+  pubkeyAgg(pubKeys: Array<Uint8Array>): {
     aggPubkey: Uint8Array;
     keyaggCache: Uint8Array;
   };
-  nonceGen(sessionId: Uint8Array): {
+  nonceGen(
+    sessionId: Uint8Array,
+    pubKey: Uint8Array
+  ): {
     pubNonce: Uint8Array;
     secNonce: Uint8Array;
   };

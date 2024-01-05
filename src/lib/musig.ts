@@ -2,25 +2,38 @@ import { CModule } from './cmodule';
 import { Secp256k1ZKP } from './interface';
 import Memory from './memory';
 
+const keyaggCacheSize = 197;
+const nonceInternalSize = 132;
+
 function pubkeyAgg(cModule: CModule): Secp256k1ZKP['musig']['pubkeyAgg'] {
-  return function pubkeyAgg(pubkeys: Array<Uint8Array>) {
-    if (!pubkeys || !pubkeys.length) {
+  return function pubkeyAgg(pubKeys: Array<Uint8Array>) {
+    if (!pubKeys || !pubKeys.length) {
       throw TypeError('pubkeys must be an Array');
     }
 
-    if (pubkeys.some((pubkey) => !(pubkey instanceof Uint8Array))) {
+    if (pubKeys.some((pubkey) => !(pubkey instanceof Uint8Array))) {
       throw TypeError('all elements of pubkeys must be Uint8Array');
+    }
+
+    if (pubKeys.some((pubkey) => pubkey.length !== pubKeys[0].length)) {
+      throw TypeError('all elements of pubkeys must have same length');
     }
 
     const memory = new Memory(cModule);
     const aggPubkey = memory.malloc(32);
-    const keyaggCache = memory.malloc(165);
+    const keyaggCache = memory.malloc(keyaggCacheSize);
 
     const ret = cModule.ccall(
       'musig_pubkey_agg',
       'number',
-      ['number', 'number', 'number', 'number'],
-      [aggPubkey, keyaggCache, memory.charStarArray(pubkeys), pubkeys.length]
+      ['number', 'number', 'number', 'number', 'number'],
+      [
+        aggPubkey,
+        keyaggCache,
+        memory.charStarArray(pubKeys),
+        pubKeys.length,
+        pubKeys[0].length,
+      ]
     );
 
     if (ret !== 1) {
@@ -30,7 +43,7 @@ function pubkeyAgg(cModule: CModule): Secp256k1ZKP['musig']['pubkeyAgg'] {
 
     const res = {
       aggPubkey: memory.charStarToUint8(aggPubkey, 32),
-      keyaggCache: memory.charStarToUint8(keyaggCache, 165),
+      keyaggCache: memory.charStarToUint8(keyaggCache, keyaggCacheSize),
     };
     memory.free();
     return res;
@@ -38,20 +51,30 @@ function pubkeyAgg(cModule: CModule): Secp256k1ZKP['musig']['pubkeyAgg'] {
 }
 
 function nonceGen(cModule: CModule): Secp256k1ZKP['musig']['nonceGen'] {
-  return function nonceGen(sessionId: Uint8Array) {
+  return function nonceGen(sessionId: Uint8Array, pubKey: Uint8Array) {
     if (!(sessionId instanceof Uint8Array)) {
       throw new TypeError('sessionId must be Uint8Array');
     }
 
+    if (!(pubKey instanceof Uint8Array)) {
+      throw new TypeError('pubkey must be Uint8Array');
+    }
+
     const memory = new Memory(cModule);
-    const secnonce = memory.malloc(68);
-    const pubnonce = memory.malloc(66);
+    const secnonce = memory.malloc(nonceInternalSize);
+    const pubnonce = memory.malloc(nonceInternalSize);
 
     const ret = cModule.ccall(
       'musig_nonce_gen',
       'number',
-      ['number', 'number', 'number'],
-      [secnonce, pubnonce, memory.charStar(sessionId)]
+      ['number', 'number', 'number', 'number', 'number'],
+      [
+        secnonce,
+        pubnonce,
+        memory.charStar(sessionId),
+        memory.charStar(pubKey),
+        pubKey.length,
+      ]
     );
 
     if (ret !== 1) {
@@ -60,7 +83,7 @@ function nonceGen(cModule: CModule): Secp256k1ZKP['musig']['nonceGen'] {
     }
 
     const res = {
-      secNonce: memory.charStarToUint8(secnonce, 68),
+      secNonce: memory.charStarToUint8(secnonce, nonceInternalSize),
       pubNonce: memory.charStarToUint8(pubnonce, 66),
     };
     memory.free();
@@ -218,11 +241,12 @@ function partialVerify(
     const ret = cModule.ccall(
       'musig_partial_sig_verify',
       'number',
-      ['number', 'number', 'number', 'number', 'number'],
+      ['number', 'number', 'number', 'number', 'number', 'number'],
       [
         memory.charStar(partialSig),
         memory.charStar(pubNonce),
         memory.charStar(pubKey),
+        pubKey.length,
         memory.charStar(keyaggCache),
         memory.charStar(session),
       ]
@@ -329,7 +353,7 @@ function pubkeyXonlyTweakAdd(
     );
     const keyaggCacheTweakedRes = memory.charStarToUint8(
       keyaggCacheTweaked,
-      165
+      keyaggCacheSize
     );
 
     memory.free();

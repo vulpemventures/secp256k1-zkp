@@ -534,21 +534,26 @@ void free_pointer_arr(void **ptrs, size_t n)
     return ret;                     \
   }
 
-int musig_pubkey_agg(unsigned char *agg_pubkey, secp256k1_musig_keyagg_cache *keyagg_cache, const unsigned char **pubkeys, size_t n_pubkeys)
+int musig_pubkey_agg(
+  unsigned char *agg_pubkey,
+  secp256k1_musig_keyagg_cache *keyagg_cache,
+  const unsigned char **pubkeys,
+  const size_t n_pubkeys,
+  const size_t pubkey_len)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
-  secp256k1_xonly_pubkey **pubkeys_ptr = (secp256k1_xonly_pubkey **)alloc_pointer_arr(n_pubkeys, sizeof(secp256k1_xonly_pubkey));
+  secp256k1_pubkey **pubkeys_ptr = (secp256k1_pubkey **)alloc_pointer_arr(n_pubkeys, sizeof(secp256k1_pubkey));
 
   int ret = 1;
   for (int i = 0; i < n_pubkeys && ret == 1; i++)
   {
-    ret = secp256k1_xonly_pubkey_parse(ctx, pubkeys_ptr[i], pubkeys[i]);
+    ret = secp256k1_ec_pubkey_parse(ctx, pubkeys_ptr[i], pubkeys[i], pubkey_len);
   }
 
   if (ret == 1)
   {
     secp256k1_xonly_pubkey agg_pubkey_temp;
-    ret = secp256k1_musig_pubkey_agg(ctx, NULL, &agg_pubkey_temp, keyagg_cache, (const secp256k1_xonly_pubkey *const *) pubkeys_ptr, n_pubkeys);
+    ret = secp256k1_musig_pubkey_agg(ctx, NULL, &agg_pubkey_temp, keyagg_cache, (const secp256k1_pubkey *const *)pubkeys_ptr, n_pubkeys);
 
     if (ret == 1)
     {
@@ -561,12 +566,21 @@ int musig_pubkey_agg(unsigned char *agg_pubkey, secp256k1_musig_keyagg_cache *ke
   return ret;
 }
 
-int musig_nonce_gen(secp256k1_musig_secnonce *secnonce, unsigned char *pubnonce, const unsigned char *session_id32)
+int musig_nonce_gen(
+  secp256k1_musig_secnonce *secnonce,
+  unsigned char *pubnonce,
+  const unsigned char *session_id32,
+  const unsigned char *pubkey,
+  const size_t pubkey_len)
 {
   secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
 
+  secp256k1_pubkey pubkey_temp;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey_temp, pubkey, pubkey_len);
+  RETURN_ON_ZERO;
+
   secp256k1_musig_pubnonce pubnonce_temp;
-  int ret = secp256k1_musig_nonce_gen(ctx, secnonce, &pubnonce_temp, session_id32, NULL, NULL, NULL, NULL);
+  ret = secp256k1_musig_nonce_gen(ctx, secnonce, &pubnonce_temp, session_id32, NULL, &pubkey_temp, NULL, NULL, NULL);
   RETURN_ON_ZERO;
 
   ret = secp256k1_musig_pubnonce_serialize(ctx, pubnonce, &pubnonce_temp);
@@ -638,6 +652,7 @@ int musig_partial_sig_verify(
   const unsigned char *partial_sig,
   const unsigned char *pubnonce,
   const unsigned char *pubkey,
+  const size_t pubkey_len,
   const secp256k1_musig_keyagg_cache *keyagg_cache,
   const secp256k1_musig_session *session)
 {
@@ -651,8 +666,8 @@ int musig_partial_sig_verify(
   ret = secp256k1_musig_pubnonce_parse(ctx, &pubnonce_temp, pubnonce);
   RETURN_ON_ZERO;
 
-  secp256k1_xonly_pubkey pubkey_temp;
-  ret = secp256k1_xonly_pubkey_parse(ctx, &pubkey_temp, pubkey);
+  secp256k1_pubkey pubkey_temp;
+  ret = secp256k1_ec_pubkey_parse(ctx, &pubkey_temp, pubkey, pubkey_len);
   RETURN_ON_ZERO;
 
   ret = secp256k1_musig_partial_sig_verify(ctx, &sig_temp, &pubnonce_temp, &pubkey_temp, keyagg_cache, session);
@@ -678,7 +693,7 @@ int musig_partial_sig_agg(
 
   if (ret == 1)
   {
-    ret = secp256k1_musig_partial_sig_agg(ctx, sig, session, (const secp256k1_musig_partial_sig *const *)sigs_ptr, n_sigs);
+    ret = secp256k1_musig_partial_sig_agg(ctx, sig, session, (const secp256k1_musig_partial_sig *const *) sigs_ptr, n_sigs);
   }
 
   free_pointer_arr((void **)sigs_ptr, n_sigs);
