@@ -1,6 +1,6 @@
 {
   "name": "@vulpemventures/secp256k1-zkp",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Essential methods of the secp256k1-zkp lib exported to TS/JS for handling Elements confidential transactions",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
