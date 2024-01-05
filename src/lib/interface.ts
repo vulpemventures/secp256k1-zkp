@@ -128,9 +128,55 @@ export interface SurjectionProof {
   ) => boolean;
 }
 
+export interface Musig {
+  pubkeyAgg(pubKeys: Array<Uint8Array>): {
+    aggPubkey: Uint8Array;
+    keyaggCache: Uint8Array;
+  };
+  nonceGen(
+    sessionId: Uint8Array,
+    pubKey: Uint8Array
+  ): {
+    pubNonce: Uint8Array;
+    secNonce: Uint8Array;
+  };
+  nonceAgg(pubNonces: Array<Uint8Array>): Uint8Array;
+  nonceProcess(
+    nonceAgg: Uint8Array,
+    msg: Uint8Array,
+    keyaggCache: Uint8Array
+  ): Uint8Array;
+  partialSign(
+    secNonce: Uint8Array,
+    secKey: Uint8Array,
+    keyaggCache: Uint8Array,
+    session: Uint8Array
+  ): Uint8Array;
+  partialVerify(
+    partialSig: Uint8Array,
+    pubNonce: Uint8Array,
+    pubKey: Uint8Array,
+    keyaggCache: Uint8Array,
+    session: Uint8Array
+  ): boolean;
+  partialSigAgg(
+    session: Uint8Array,
+    partialSigs: Array<Uint8Array>
+  ): Uint8Array;
+  pubkeyXonlyTweakAdd(
+    keyaggCache: Uint8Array,
+    tweak: Uint8Array,
+    compress?: boolean
+  ): {
+    pubkey: Uint8Array;
+    keyaggCache: Uint8Array;
+  };
+}
+
 export interface Secp256k1ZKP {
   ecdh: Ecdh;
   ecc: Ecc;
+  musig: Musig;
   surjectionproof: SurjectionProof;
   rangeproof: RangeProof;
   pedersen: Pedersen;

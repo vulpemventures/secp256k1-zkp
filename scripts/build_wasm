@@ -12,7 +12,7 @@ fi
 OPTIMIZATION_LEVEL=s
 # C functions to export to Javascript
 EXPORTED_RUNTIME_METHODS="['getValue', 'setValue', 'ccall']"
-EXPORTED_FUNCTIONS="['_secp256k1_ecmult_gen_prec_table', '_secp256k1_pre_g', '_free', '_malloc', '_ecdh', '_generator_generate', '_generator_generate_blinded', '_pedersen_blind_generator_blind_sum', '_pedersen_commitment', '_rangeproof_sign', '_rangeproof_info', '_rangeproof_verify', '_rangeproof_rewind', '_surjectionproof_initialize', '_surjectionproof_generate', '_surjectionproof_verify', '_ec_seckey_negate', '_ec_seckey_tweak_add', '_ec_seckey_tweak_sub', '_ec_seckey_tweak_mul', '_ec_is_point', '_ec_point_compress', '_ec_point_from_scalar', '_ec_x_only_point_tweak_add', '_ec_sign_ecdsa', '_ec_verify_ecdsa', '_ec_sign_schnorr', '_ec_verify_schnorr', '_ec_seckey_verify', '_ec_point_add_scalar']"
+EXPORTED_FUNCTIONS="['_secp256k1_ecmult_gen_prec_table', '_secp256k1_pre_g', '_free', '_malloc', '_ecdh', '_generator_generate', '_generator_generate_blinded', '_pedersen_blind_generator_blind_sum', '_pedersen_commitment', '_rangeproof_sign', '_rangeproof_info', '_rangeproof_verify', '_rangeproof_rewind', '_surjectionproof_initialize', '_surjectionproof_generate', '_surjectionproof_verify', '_ec_seckey_negate', '_ec_seckey_tweak_add', '_ec_seckey_tweak_sub', '_ec_seckey_tweak_mul', '_ec_is_point', '_ec_point_compress', '_ec_point_from_scalar', '_ec_x_only_point_tweak_add', '_ec_sign_ecdsa', '_ec_verify_ecdsa', '_ec_sign_schnorr', '_ec_verify_schnorr', '_ec_seckey_verify', '_ec_point_add_scalar', '_musig_pubkey_agg', '_musig_nonce_gen', '_musig_nonce_agg', '_musig_nonce_process', '_musig_partial_sign', '_musig_partial_sig_verify', '_musig_partial_sig_agg', '_musig_pubkey_xonly_tweak_add']"
 
 SECP256K1_SOURCE_DIR=secp256k1-zkp
 
@@ -22,7 +22,7 @@ cd ${SECP256K1_SOURCE_DIR}
 ./autogen.sh
 
 # Compile secp256k1 to bitcode  
-emconfigure ./configure --enable-tests=no --enable-exhaustive-tests=no --enable-benchmark=no --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-schnorrsig=yes --enable-module-extrakeys=yes --enable-module-ecdh=yes
+emconfigure ./configure --enable-tests=no --enable-exhaustive-tests=no --enable-benchmark=no --enable-module-rangeproof=yes --enable-module-surjectionproof=yes --enable-experimental=yes --enable-module-generator=yes --enable-module-schnorrsig=yes --enable-module-extrakeys=yes --enable-module-ecdh=yes --enable-module-musig=yes
 emmake make -j $num_jobs
 
 # go back to the root folder
@@ -40,6 +40,8 @@ emcc -O$OPTIMIZATION_LEVEL \
     -s SINGLE_FILE=1 \
     -s ALLOW_MEMORY_GROWTH=1 \
     -I${SECP256K1_SOURCE_DIR}/include \
-    ${SECP256K1_SOURCE_DIR}/src/*.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_la-secp256k1.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_precomputed_la-precomputed_ecmult.o \
+    ${SECP256K1_SOURCE_DIR}/src/libsecp256k1_precomputed_la-precomputed_ecmult_gen.o \
     ./main.c \
     -o ./dist/secp256k1-zkp.js

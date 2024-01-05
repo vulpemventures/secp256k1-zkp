@@ -3,6 +3,7 @@
 #include "string.h"
 #include "secp256k1.h"
 #include "secp256k1_ecdh.h"
+#include "secp256k1_musig.h"
 #include "secp256k1_generator.h"
 #include "secp256k1_rangeproof.h"
 #include "secp256k1_preallocated.h"
@@ -503,6 +504,218 @@ int ec_point_add_scalar(unsigned char *output, size_t *output_len, const unsigne
       }
     }
   }
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+void **alloc_pointer_arr(size_t n, size_t elem_size)
+{
+  void **arr = malloc(sizeof(void *) * n);
+  for (int i = 0; i < n; i++)
+  {
+    arr[i] = malloc(elem_size);
+  }
+  return arr;
+}
+
+void free_pointer_arr(void **ptrs, size_t n)
+{
+  for (int i = 0; i < n; i++)
+  {
+    free(ptrs[i]);
+  }
+  free(ptrs);
+}
+
+#define RETURN_ON_ZERO              \
+  if (ret == 0)                     \
+  {                                 \
+    secp256k1_context_destroy(ctx); \
+    return ret;                     \
+  }
+
+int musig_pubkey_agg(
+  unsigned char *agg_pubkey,
+  secp256k1_musig_keyagg_cache *keyagg_cache,
+  const unsigned char **pubkeys,
+  const size_t n_pubkeys,
+  const size_t pubkey_len)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+  secp256k1_pubkey **pubkeys_ptr = (secp256k1_pubkey **)alloc_pointer_arr(n_pubkeys, sizeof(secp256k1_pubkey));
+
+  int ret = 1;
+  for (int i = 0; i < n_pubkeys && ret == 1; i++)
+  {
+    ret = secp256k1_ec_pubkey_parse(ctx, pubkeys_ptr[i], pubkeys[i], pubkey_len);
+  }
+
+  if (ret == 1)
+  {
+    secp256k1_xonly_pubkey agg_pubkey_temp;
+    ret = secp256k1_musig_pubkey_agg(ctx, NULL, &agg_pubkey_temp, keyagg_cache, (const secp256k1_pubkey *const *)pubkeys_ptr, n_pubkeys);
+
+    if (ret == 1)
+    {
+      ret = secp256k1_xonly_pubkey_serialize(ctx, agg_pubkey, &agg_pubkey_temp);
+    }
+  }
+
+  free_pointer_arr((void **)pubkeys_ptr, n_pubkeys);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_nonce_gen(
+  secp256k1_musig_secnonce *secnonce,
+  unsigned char *pubnonce,
+  const unsigned char *session_id32,
+  const unsigned char *pubkey,
+  const size_t pubkey_len)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+
+  secp256k1_pubkey pubkey_temp;
+  int ret = secp256k1_ec_pubkey_parse(ctx, &pubkey_temp, pubkey, pubkey_len);
+  RETURN_ON_ZERO;
+
+  secp256k1_musig_pubnonce pubnonce_temp;
+  ret = secp256k1_musig_nonce_gen(ctx, secnonce, &pubnonce_temp, session_id32, NULL, &pubkey_temp, NULL, NULL, NULL);
+  RETURN_ON_ZERO;
+
+  ret = secp256k1_musig_pubnonce_serialize(ctx, pubnonce, &pubnonce_temp);
+
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_nonce_agg(unsigned char *aggnonce, const unsigned char *const *pubnonces, size_t n_pubnonces)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+  secp256k1_musig_pubnonce **pubnonces_ptr = (secp256k1_musig_pubnonce **)alloc_pointer_arr(n_pubnonces, sizeof(secp256k1_musig_pubnonce));
+
+  int ret = 1;
+  for (int i = 0; i < n_pubnonces && ret == 1; i++)
+  {
+    ret = secp256k1_musig_pubnonce_parse(ctx, pubnonces_ptr[i], pubnonces[i]);
+  }
+
+  if (ret == 1)
+  {
+    secp256k1_musig_aggnonce aggnonce_temp;
+    ret = secp256k1_musig_nonce_agg(ctx, &aggnonce_temp, (const secp256k1_musig_pubnonce *const *)pubnonces_ptr, n_pubnonces);
+
+    if (ret == 1)
+    {
+      ret = secp256k1_musig_aggnonce_serialize(ctx, aggnonce, &aggnonce_temp);
+    }
+  }
+
+  free_pointer_arr((void **)pubnonces_ptr, n_pubnonces);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_nonce_process(secp256k1_musig_session *session, const unsigned char *aggnonce_serialized, const unsigned char *msg32, const secp256k1_musig_keyagg_cache *keyagg_cache)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+
+  secp256k1_musig_aggnonce aggnonce;
+  int ret = secp256k1_musig_aggnonce_parse(ctx, &aggnonce, aggnonce_serialized);
+  RETURN_ON_ZERO;
+
+  ret = secp256k1_musig_nonce_process(ctx, session, &aggnonce, msg32, keyagg_cache, NULL);
+
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_partial_sign(unsigned char *partial_sig, secp256k1_musig_secnonce *secnonce, const unsigned char *seckey, const secp256k1_musig_keyagg_cache *keyagg_cache, const secp256k1_musig_session *session)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+
+  secp256k1_keypair keypair;
+  int ret = secp256k1_keypair_create(ctx, &keypair, seckey);
+  RETURN_ON_ZERO;
+
+  secp256k1_musig_partial_sig sig_temp;
+  ret = secp256k1_musig_partial_sign(ctx, &sig_temp, secnonce, &keypair, keyagg_cache, session);
+  RETURN_ON_ZERO;
+
+  ret = secp256k1_musig_partial_sig_serialize(ctx, partial_sig, &sig_temp);
+
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_partial_sig_verify(
+  const unsigned char *partial_sig,
+  const unsigned char *pubnonce,
+  const unsigned char *pubkey,
+  const size_t pubkey_len,
+  const secp256k1_musig_keyagg_cache *keyagg_cache,
+  const secp256k1_musig_session *session)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+
+  secp256k1_musig_partial_sig sig_temp;
+  int ret = secp256k1_musig_partial_sig_parse(ctx, &sig_temp, partial_sig);
+  RETURN_ON_ZERO;
+
+  secp256k1_musig_pubnonce pubnonce_temp;
+  ret = secp256k1_musig_pubnonce_parse(ctx, &pubnonce_temp, pubnonce);
+  RETURN_ON_ZERO;
+
+  secp256k1_pubkey pubkey_temp;
+  ret = secp256k1_ec_pubkey_parse(ctx, &pubkey_temp, pubkey, pubkey_len);
+  RETURN_ON_ZERO;
+
+  ret = secp256k1_musig_partial_sig_verify(ctx, &sig_temp, &pubnonce_temp, &pubkey_temp, keyagg_cache, session);
+
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_partial_sig_agg(
+  unsigned char *sig,
+  const secp256k1_musig_session *session,
+  unsigned char **partial_sigs,
+  size_t n_sigs)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+  secp256k1_musig_partial_sig **sigs_ptr = (secp256k1_musig_partial_sig **)alloc_pointer_arr(n_sigs, sizeof(secp256k1_musig_partial_sig));
+
+  int ret = 1;
+  for (int i = 0; i < n_sigs && ret == 1; i++)
+  {
+    ret = secp256k1_musig_partial_sig_parse(ctx, sigs_ptr[i], partial_sigs[i]);
+  }
+
+  if (ret == 1)
+  {
+    ret = secp256k1_musig_partial_sig_agg(ctx, sig, session, (const secp256k1_musig_partial_sig *const *) sigs_ptr, n_sigs);
+  }
+
+  free_pointer_arr((void **)sigs_ptr, n_sigs);
+  secp256k1_context_destroy(ctx);
+  return ret;
+}
+
+int musig_pubkey_xonly_tweak_add(
+  unsigned char *output,
+  size_t *output_len,
+  int compress,
+  secp256k1_musig_keyagg_cache *keyagg_cache,
+  const unsigned char *tweak)
+{
+  secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+
+  secp256k1_pubkey output_temp;
+  int ret = secp256k1_musig_pubkey_xonly_tweak_add(ctx, &output_temp, keyagg_cache, tweak);
+  RETURN_ON_ZERO;
+
+  ret = secp256k1_ec_pubkey_serialize(ctx, output, output_len, &output_temp, compress ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);
+
   secp256k1_context_destroy(ctx);
   return ret;
 }
